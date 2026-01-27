@@ -1,15 +1,13 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { signout } from '../auth/actions'
-import InterviewsTable from '../interviews/InterviewsTable'
+import { getAllInterviews } from '../actions'
+import { signout } from '@/app/auth/actions'
+import AllInterviewsView from './AllInterviewsView'
 import Link from 'next/link'
 
-export default async function DashboardPage() {
+export default async function AllInterviewsPage() {
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/auth/signin')
@@ -22,17 +20,11 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || !profile.verified) {
-    await supabase.auth.signOut()
-    redirect('/auth/signin')
+  if (!profile?.verified) {
+    redirect('/auth/signin?error=Please wait for admin verification')
   }
 
-  // Fetch user's interviews
-  const { data: interviews } = await supabase
-    .from('interviews')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('interview_date', { ascending: false })
+  const result = await getAllInterviews()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,10 +36,10 @@ export default async function DashboardPage() {
             </div>
             <div className="flex items-center space-x-4">
               <Link
-                href="/interviews/all"
+                href="/dashboard"
                 className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
               >
-                All Interviews
+                My Interviews
               </Link>
               <span className="text-sm text-gray-700">
                 {user.user_metadata?.name || user.email}
@@ -67,7 +59,7 @@ export default async function DashboardPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <InterviewsTable initialInterviews={interviews || []} />
+          <AllInterviewsView initialInterviews={result.data || []} />
         </div>
       </main>
     </div>

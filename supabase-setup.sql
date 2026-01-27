@@ -18,14 +18,15 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can view all profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 
--- Create policy: Users can view their own profile
-CREATE POLICY "Users can view own profile"
+-- Create policy: Users can view all profiles (read-only)
+CREATE POLICY "Users can view all profiles"
   ON public.profiles
   FOR SELECT
-  USING (auth.uid() = id);
+  USING (auth.uid() IS NOT NULL);
 
 -- Create policy: Users can update their own profile
 CREATE POLICY "Users can update own profile"
@@ -134,15 +135,17 @@ ALTER TABLE public.interviews ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Users can view own interviews" ON public.interviews;
+DROP POLICY IF EXISTS "Users can view all interviews" ON public.interviews;
 DROP POLICY IF EXISTS "Users can insert own interviews" ON public.interviews;
 DROP POLICY IF EXISTS "Users can update own interviews" ON public.interviews;
 DROP POLICY IF EXISTS "Users can delete own interviews" ON public.interviews;
 
 -- Create policies for interviews
-CREATE POLICY "Users can view own interviews"
+-- Allow authenticated users to view ALL interviews
+CREATE POLICY "Users can view all interviews"
   ON public.interviews
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Users can insert own interviews"
   ON public.interviews

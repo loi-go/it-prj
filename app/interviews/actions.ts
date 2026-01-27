@@ -25,6 +25,49 @@ export async function getInterviews() {
   return { data }
 }
 
+export async function getAllInterviews() {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return { error: 'Unauthorized' }
+  }
+
+  // Get all interviews
+  const { data: interviewsData, error: interviewsError } = await supabase
+    .from('interviews')
+    .select('*')
+    .order('interview_date', { ascending: false })
+
+  if (interviewsError) {
+    console.error('Error fetching interviews:', interviewsError)
+    return { error: interviewsError.message }
+  }
+
+  // Get all profiles
+  const { data: profilesData, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, name')
+
+  if (profilesError) {
+    console.error('Error fetching profiles:', profilesError)
+    return { error: profilesError.message }
+  }
+
+  // Map profiles to interviews
+  const profilesMap = new Map(profilesData?.map(p => [p.id, p.name]) || [])
+  
+  const data = interviewsData?.map(interview => ({
+    ...interview,
+    profiles: {
+      name: profilesMap.get(interview.user_id) || 'Unknown'
+    }
+  }))
+
+  return { data }
+}
+
 export async function createInterview(formData: FormData) {
   const supabase = await createClient()
   
@@ -45,16 +88,18 @@ export async function createInterview(formData: FormData) {
     interview_type: formData.get('interview_type') as string || null,
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('interviews')
     .insert([interview])
+    .select()
+    .single()
 
   if (error) {
     return { error: error.message }
   }
 
   revalidatePath('/dashboard')
-  return { success: true }
+  return { success: true, data }
 }
 
 export async function updateInterview(id: string, formData: FormData) {
@@ -76,18 +121,20 @@ export async function updateInterview(id: string, formData: FormData) {
     interview_type: formData.get('interview_type') as string || null,
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('interviews')
     .update(updates)
     .eq('id', id)
     .eq('user_id', user.id)
+    .select()
+    .single()
 
   if (error) {
     return { error: error.message }
   }
 
   revalidatePath('/dashboard')
-  return { success: true }
+  return { success: true, data }
 }
 
 export async function deleteInterview(id: string) {

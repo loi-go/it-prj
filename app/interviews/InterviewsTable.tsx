@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createInterview, updateInterview, deleteInterview, getInterviews } from './actions'
+import { createInterview, updateInterview, deleteInterview } from './actions'
 
 type Interview = {
   id: string
@@ -197,17 +197,13 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     if (result.error) {
       alert('Error: ' + result.error)
       setLoading(false)
-    } else {
-      await refreshInterviews()
+    } else if (result.data) {
+      // Update only the specific interview in local state
+      setInterviews(prev => prev.map(interview => 
+        interview.id === statusChangeInterview.id ? result.data : interview
+      ))
       setLoading(false)
       closeStatusModal()
-    }
-  }
-
-  const refreshInterviews = async () => {
-    const result = await getInterviews()
-    if (result.data) {
-      setInterviews(result.data)
     }
   }
 
@@ -238,8 +234,17 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     if (result.error) {
       setError(result.error)
       setLoading(false)
-    } else {
-      await refreshInterviews()
+    } else if (result.data) {
+      // Update local state directly without re-fetching
+      if (editingInterview) {
+        // Update existing interview
+        setInterviews(prev => prev.map(interview => 
+          interview.id === editingInterview.id ? result.data : interview
+        ))
+      } else {
+        // Add new interview to the beginning
+        setInterviews(prev => [result.data, ...prev])
+      }
       setLoading(false)
       closeModal()
     }
@@ -257,7 +262,8 @@ export default function InterviewsTable({ initialInterviews }: Props) {
       alert('Error: ' + result.error)
       setLoading(false)
     } else {
-      await refreshInterviews()
+      // Remove from local state
+      setInterviews(prev => prev.filter(interview => interview.id !== id))
       setLoading(false)
     }
   }
@@ -525,71 +531,109 @@ export default function InterviewsTable({ initialInterviews }: Props) {
             )[0]
 
             return (
-              <div key={key} className="bg-white rounded-lg shadow-md overflow-hidden">
-                {/* Parent Card */}
+              <div key={key} className="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                {/* Parent Card - Company Header */}
                 <div
-                  className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="p-6 cursor-pointer hover:bg-indigo-50 transition-all bg-gradient-to-r from-white to-gray-50"
                   onClick={() => toggleCard(key)}
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">
-                        {group.profile}-{group.company}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex justify-between items-start gap-4">
+                    {/* Left side - Company info and progress */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-3">
+                        {/* Expand/Collapse Icon */}
+                        <svg
+                          className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        
+                        {/* Company Title */}
+                        <h3 className="text-xl font-bold text-gray-900">
+                          {group.profile} · {group.company}
+                        </h3>
+                      </div>
+                      
+                      {/* Interview Steps Progress */}
+                      <div className="flex items-center flex-wrap gap-2 text-sm text-gray-600 ml-7">
                         {sortedInterviews.map((interview, idx) => (
                           <span key={interview.id} className="flex items-center">
-                            <span className="font-medium">{interview.step}</span>
+                            <span className="font-semibold text-gray-700">{interview.step}</span>
                             <span className="text-xs text-gray-500 ml-1">({formatDate(interview.interview_date)})</span>
                             {idx < sortedInterviews.length - 1 && (
-                              <span className="mx-2">→</span>
+                              <span className="mx-2 text-indigo-400 font-bold">→</span>
                             )}
                           </span>
                         ))}
                       </div>
                     </div>
+                    
+                    {/* Right side - Status Badge */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         openStatusModal(latestInterview)
                       }}
-                      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStateColor(group.latestStatus)} hover:opacity-80 transition-opacity`}
+                      className={`px-4 py-2 inline-flex text-sm font-bold rounded-lg ${getStateColor(group.latestStatus)} hover:ring-2 hover:ring-offset-2 hover:ring-indigo-500 transition-all shadow-sm`}
                     >
                       {group.latestStatus}
                     </button>
                   </div>
                 </div>
 
-                {/* Expanded Child Cards */}
+                {/* Expanded Child Cards - Individual Interviews */}
                 {isExpanded && (
-                  <div className="border-t border-gray-200 bg-gray-50">
-                    {sortedInterviews.map((interview) => (
-                      <div key={interview.id} className="p-4 border-b border-gray-200 last:border-b-0">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{interview.step}</h4>
-                            <p className="text-sm text-gray-500">{formatDate(interview.interview_date)}</p>
+                  <div className="border-t-4 border-indigo-200 bg-gradient-to-b from-gray-50 to-gray-100">
+                    <div className="px-6 py-3 bg-indigo-50 border-b border-indigo-100">
+                      <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">Interview Details</p>
+                    </div>
+                    
+                    {sortedInterviews.map((interview, idx) => (
+                      <div 
+                        key={interview.id} 
+                        className="mx-4 my-3 bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                      >
+                        {/* Interview Header - Single Line */}
+                        <div className="flex justify-between items-center mb-3">
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-sm flex-shrink-0">
+                              {idx + 1}
+                            </div>
+                            <h4 className="font-bold text-gray-900 text-base">{interview.step}</h4>
                           </div>
-                          <div className="flex space-x-2">
+                          
+                          {/* Date and Action Buttons */}
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm text-gray-600">
+                              📅 {formatDate(interview.interview_date)}
+                            </span>
                             <button
                               onClick={() => openEditModal(interview)}
-                              className="text-sm text-indigo-600 hover:text-indigo-900"
+                              className="px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
                             >
-                              Edit
+                              ✏️ Edit
                             </button>
                             <button
                               onClick={() => handleDelete(interview.id)}
-                              className="text-sm text-red-600 hover:text-red-900"
+                              className="px-3 py-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
                               disabled={loading}
                             >
-                              Delete
+                              🗑️ Delete
                             </button>
                           </div>
                         </div>
+                        
+                        {/* Interview Note */}
                         {interview.note && (
-                          <p className="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200">
-                            {interview.note}
-                          </p>
+                          <div className="mt-2">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">Note:</p>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300">
+                              {interview.note}
+                            </p>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -777,6 +821,18 @@ export default function InterviewsTable({ initialInterviews }: Props) {
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Spinner Overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-xl">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              <p className="mt-4 text-sm text-gray-700 font-medium">Processing...</p>
             </div>
           </div>
         </div>
