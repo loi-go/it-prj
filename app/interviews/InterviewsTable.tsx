@@ -13,6 +13,7 @@ type Interview = {
   state: 'Ongoing' | 'Rejected' | 'Offer'
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
   image_url: string | null
+  script: string | null
 }
 
 type GroupedInterview = {
@@ -39,6 +40,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [deleteExistingImage, setDeleteExistingImage] = useState(false)
   const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null)
+  const [copiedScriptId, setCopiedScriptId] = useState<string | null>(null)
   
   // Filter states
   const [selectedProfiles, setSelectedProfiles] = useState<Set<string>>(new Set())
@@ -209,6 +211,16 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     const fileInput = document.getElementById('image-upload') as HTMLInputElement
     if (fileInput) {
       fileInput.value = ''
+    }
+  }
+
+  const handleCopyScript = async (script: string, interviewId: string) => {
+    try {
+      await navigator.clipboard.writeText(script)
+      setCopiedScriptId(interviewId)
+      setTimeout(() => setCopiedScriptId(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy script:', err)
     }
   }
 
@@ -683,19 +695,53 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         {interview.image_url && (
                           <div className="mt-2">
                             <p className="text-xs font-semibold text-gray-500 mb-1">Attached Image:</p>
-                            <img 
-                              src={interview.image_url} 
-                              alt="Interview attachment"
-                              className="max-w-xs h-32 object-contain bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => setZoomImageUrl(interview.image_url)}
-                            />
+                            <div className="flex justify-center">
+                              <img 
+                                src={interview.image_url} 
+                                alt="Interview attachment"
+                                className="max-w-xs h-32 object-contain bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() => setZoomImageUrl(interview.image_url)}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Interview Script */}
+                        {interview.script && (
+                          <div className="mt-2">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-xs font-semibold text-gray-500">Interview Script:</p>
+                              <button
+                                onClick={() => handleCopyScript(interview.script!, interview.id)}
+                                className="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded transition-colors flex items-center gap-1"
+                              >
+                                {copiedScriptId === interview.id ? (
+                                  <>
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Copied!
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Copy
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                            <pre className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-green-300 whitespace-pre-wrap font-sans overflow-y-auto max-h-32">
+                              {interview.script}
+                            </pre>
                           </div>
                         )}
                         
                         {/* Interview Note */}
                         {interview.note && (
                           <div className="mt-2">
-                            <p className="text-xs font-semibold text-gray-500 mb-1">Note:</p>
+                            <p className="text-xs font-semibold text-gray-500 mb-1">Additional Note:</p>
                             <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300">
                               {interview.note}
                             </p>
@@ -791,16 +837,20 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label htmlFor="note" className="block text-sm font-medium text-gray-700">
-                    Detailed Information
+                  <label htmlFor="script" className="block text-sm font-medium text-gray-700">
+                    Interview Script (Optional)
                   </label>
                   <textarea
-                    name="note"
-                    id="note"
-                    rows={3}
-                    defaultValue={editingInterview?.note || ''}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    name="script"
+                    id="script"
+                    rows={6}
+                    placeholder="Enter interview questions, answers, or conversation script..."
+                    defaultValue={editingInterview?.script || ''}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm font-mono text-xs"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Record interview questions, answers, or full conversation transcript
+                  </p>
                 </div>
 
                 {/* Image Upload Section */}
@@ -848,6 +898,19 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label htmlFor="note" className="block text-sm font-medium text-gray-700">
+                  Additional Note (Optional)
+                </label>
+                <textarea
+                  name="note"
+                  id="note"
+                  rows={3}
+                  defaultValue={editingInterview?.note || ''}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                />
               </div>
 
               <div className="mt-6 flex justify-end space-x-3">
