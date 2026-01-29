@@ -11,6 +11,7 @@ type Interview = {
   note: string | null
   state: 'Ongoing' | 'Rejected' | 'Offer'
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
+  image_url: string | null
   profiles: {
     name: string
   } | null
@@ -31,6 +32,7 @@ type Props = {
 export default function AllInterviewsView({ initialInterviews }: Props) {
   const [interviews] = useState<Interview[]>(initialInterviews)
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
+  const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null)
   
   // Filter states
   const [selectedUser, setSelectedUser] = useState<string>('')
@@ -456,6 +458,19 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                               </div>
                             </div>
                             
+                            {/* Interview Image */}
+                            {interview.image_url && (
+                              <div className="mt-2">
+                                <p className="text-xs font-semibold text-gray-500 mb-1">Attached Image:</p>
+                                <img 
+                                  src={interview.image_url} 
+                                  alt="Interview attachment"
+                                  className="max-w-xs h-32 object-contain bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                                  onClick={() => setZoomImageUrl(interview.image_url)}
+                                />
+                              </div>
+                            )}
+                            
                             {/* Interview Note */}
                             {interview.note && (
                               <div className="mt-2">
@@ -476,6 +491,31 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
           )}
         </div>
       </div>
+
+      {/* Image Zoom Modal */}
+      {zoomImageUrl && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50"
+          onClick={() => setZoomImageUrl(null)}
+        >
+          <div className="relative max-w-7xl max-h-full">
+            <button
+              onClick={() => setZoomImageUrl(null)}
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2 transition-all"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <img 
+              src={zoomImageUrl} 
+              alt="Zoomed view" 
+              className="max-w-full max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

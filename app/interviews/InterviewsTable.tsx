@@ -12,6 +12,7 @@ type Interview = {
   note: string | null
   state: 'Ongoing' | 'Rejected' | 'Offer'
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
+  image_url: string | null
 }
 
 type GroupedInterview = {
@@ -34,6 +35,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
   const [statusModalOpen, setStatusModalOpen] = useState(false)
   const [statusChangeInterview, setStatusChangeInterview] = useState<Interview | null>(null)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [deleteExistingImage, setDeleteExistingImage] = useState(false)
+  const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null)
   
   // Filter states
   const [selectedProfiles, setSelectedProfiles] = useState<Set<string>>(new Set())
@@ -154,12 +159,18 @@ export default function InterviewsTable({ initialInterviews }: Props) {
   const openCreateModal = () => {
     setEditingInterview(null)
     setError(null)
+    setSelectedImage(null)
+    setImagePreview(null)
+    setDeleteExistingImage(false)
     setIsModalOpen(true)
   }
 
   const openEditModal = (interview: Interview) => {
     setEditingInterview(interview)
     setError(null)
+    setSelectedImage(null)
+    setImagePreview(interview.image_url)
+    setDeleteExistingImage(false)
     setIsModalOpen(true)
   }
 
@@ -167,6 +178,38 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     setIsModalOpen(false)
     setEditingInterview(null)
     setError(null)
+    setSelectedImage(null)
+    setImagePreview(null)
+    setDeleteExistingImage(false)
+  }
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file')
+        return
+      }
+      setSelectedImage(file)
+      setDeleteExistingImage(false)
+      // Create preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+    setDeleteExistingImage(true)
+    // Reset file input
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
+    }
   }
 
   const openStatusModal = (interview: Interview) => {
@@ -214,6 +257,16 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
     const form = e.currentTarget
     const formData = new FormData(form)
+
+    // Add image if selected
+    if (selectedImage) {
+      formData.append('image', selectedImage)
+    }
+
+    // Add delete image flag
+    if (deleteExistingImage) {
+      formData.append('deleteImage', 'true')
+    }
 
     // Set default values
     if (editingInterview) {
@@ -626,6 +679,19 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                           </div>
                         </div>
                         
+                        {/* Interview Image */}
+                        {interview.image_url && (
+                          <div className="mt-2">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">Attached Image:</p>
+                            <img 
+                              src={interview.image_url} 
+                              alt="Interview attachment"
+                              className="max-w-xs h-32 object-contain bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                              onClick={() => setZoomImageUrl(interview.image_url)}
+                            />
+                          </div>
+                        )}
+                        
                         {/* Interview Note */}
                         {interview.note && (
                           <div className="mt-2">
@@ -689,6 +755,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     name="company"
                     id="company"
                     required
+                    placeholder="e.g., Google, Apple, Facebook"
                     defaultValue={editingInterview?.company}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   />
@@ -725,7 +792,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
                 <div className="sm:col-span-2">
                   <label htmlFor="note" className="block text-sm font-medium text-gray-700">
-                    Notes
+                    Detailed Information
                   </label>
                   <textarea
                     name="note"
@@ -734,6 +801,52 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     defaultValue={editingInterview?.note || ''}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                   />
+                </div>
+
+                {/* Image Upload Section */}
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Attach Image (Optional)
+                  </label>
+                  
+                  {/* Image Preview or Upload Button */}
+                  {imagePreview ? (
+                    <div className="space-y-2">
+                      <div className="relative border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="max-w-full h-48 object-contain mx-auto"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="w-full px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        type="file"
+                        id="image-upload"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        📎 Attach Image
+                      </label>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Supported formats: JPG, PNG, GIF (Max size: 5MB)
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -834,6 +947,31 @@ export default function InterviewsTable({ initialInterviews }: Props) {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
               <p className="mt-4 text-sm text-gray-700 font-medium">Processing...</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Zoom Modal */}
+      {zoomImageUrl && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50"
+          onClick={() => setZoomImageUrl(null)}
+        >
+          <div className="relative max-w-7xl max-h-full">
+            <button
+              onClick={() => setZoomImageUrl(null)}
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full p-2 transition-all"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <img 
+              src={zoomImageUrl} 
+              alt="Zoomed view" 
+              className="max-w-full max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
         </div>
       )}
