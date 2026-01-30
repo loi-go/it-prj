@@ -1,11 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getAllInterviews } from '../actions'
 import { signout } from '@/app/auth/actions'
-import AllInterviewsView from './AllInterviewsView'
+import StandupsView from './StandupsView'
 import Link from 'next/link'
 
-export default async function AllInterviewsPage() {
+export default async function StandupsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -24,29 +23,35 @@ export default async function AllInterviewsPage() {
     redirect('/auth/signin?error=Please wait for admin verification')
   }
 
-  const result = await getAllInterviews()
-
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-8">
               <h1 className="text-xl font-bold text-gray-900">Interview Tracker</h1>
+              <div className="flex space-x-4">
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                >
+                  My Interviews
+                </Link>
+                <Link
+                  href="/interviews/all"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                >
+                  All Interviews
+                </Link>
+                <Link
+                  href="/standups"
+                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
+                >
+                  Daily Standups
+                </Link>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link
-                href="/standups"
-                className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-              >
-                Daily Standups
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-              >
-                My Interviews
-              </Link>
               <span className="text-sm text-gray-700">
                 {user.user_metadata?.name || user.email}
               </span>
@@ -65,10 +70,9 @@ export default async function AllInterviewsPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <AllInterviewsView initialInterviews={result.data || []} />
+          <StandupsView currentUserId={user.id} />
         </div>
       </main>
     </div>
   )
 }
-
