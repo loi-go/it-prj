@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { createInterview, updateInterview, deleteInterview } from './actions'
+import { analyzeInterviewScript } from './ai-actions'
+import ReactMarkdown from 'react-markdown'
 
 type Interview = {
   id: string
@@ -41,6 +43,13 @@ export default function InterviewsTable({ initialInterviews }: Props) {
   const [deleteExistingImage, setDeleteExistingImage] = useState(false)
   const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null)
   const [copiedScriptId, setCopiedScriptId] = useState<string | null>(null)
+  const [scriptModalOpen, setScriptModalOpen] = useState(false)
+  const [currentScript, setCurrentScript] = useState<string | null>(null)
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [aiResponses, setAiResponses] = useState<Array<{prompt: string, response: string}>>([])
+  const [aiLoading, setAiLoading] = useState(false)
+  const [leftWidth, setLeftWidth] = useState(66.66) // 2/3 = 66.66%
+  const [isDragging, setIsDragging] = useState(false)
   
   // Filter states
   const [selectedProfiles, setSelectedProfiles] = useState<Set<string>>(new Set())
@@ -222,6 +231,63 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     } catch (err) {
       console.error('Failed to copy script:', err)
     }
+  }
+
+  const openScriptModal = (script: string) => {
+    setCurrentScript(script)
+    setScriptModalOpen(true)
+    setAiPrompt('')
+    setAiResponses([])
+  }
+
+  const closeScriptModal = () => {
+    setScriptModalOpen(false)
+    setCurrentScript(null)
+    setAiPrompt('')
+    setAiResponses([])
+    setLeftWidth(66.66) // Reset to default
+  }
+
+  const handleMouseDown = () => {
+    setIsDragging(true)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging) return
+    
+    const modal = e.currentTarget
+    const rect = modal.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const percentage = (x / rect.width) * 100
+    
+    // Limit between 30% and 80%
+    if (percentage >= 30 && percentage <= 80) {
+      setLeftWidth(percentage)
+    }
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleAiAnalysis = async () => {
+    if (!currentScript || !aiPrompt.trim()) return
+    
+    setAiLoading(true)
+    const result = await analyzeInterviewScript(currentScript, aiPrompt)
+    
+    if (result.success) {
+      const newResponse = { 
+        prompt: aiPrompt, 
+        response: result.response 
+      }
+      setAiResponses([...aiResponses, newResponse])
+      setAiPrompt('')
+    } else {
+      alert(`Error: ${result.error}`)
+    }
+    
+    setAiLoading(false)
   }
 
   const openStatusModal = (interview: Interview) => {
@@ -691,6 +757,16 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                           </div>
                         </div>
                         
+                        {/* Interview Note */}
+                        {interview.note && (
+                          <div className="mt-2">
+                            <p className="text-xs font-semibold text-gray-500 mb-1">Note:</p>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300">
+                              {interview.note}
+                            </p>
+                          </div>
+                        )}
+                        
                         {/* Interview Image */}
                         {interview.image_url && (
                           <div className="mt-2">
@@ -709,42 +785,15 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         {/* Interview Script */}
                         {interview.script && (
                           <div className="mt-2">
-                            <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
                               <p className="text-xs font-semibold text-gray-500">Interview Script:</p>
                               <button
-                                onClick={() => handleCopyScript(interview.script!, interview.id)}
-                                className="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded transition-colors flex items-center gap-1"
+                                onClick={() => openScriptModal(interview.script!)}
+                                className="text-xs px-3 py-1 bg-green-600 text-white hover:bg-green-700 rounded transition-colors font-medium"
                               >
-                                {copiedScriptId === interview.id ? (
-                                  <>
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Copied!
-                                  </>
-                                ) : (
-                                  <>
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    Copy
-                                  </>
-                                )}
+                                View
                               </button>
                             </div>
-                            <pre className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-green-300 whitespace-pre-wrap font-sans overflow-y-auto max-h-32">
-                              {interview.script}
-                            </pre>
-                          </div>
-                        )}
-                        
-                        {/* Interview Note */}
-                        {interview.note && (
-                          <div className="mt-2">
-                            <p className="text-xs font-semibold text-gray-500 mb-1">Additional Note:</p>
-                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300">
-                              {interview.note}
-                            </p>
                           </div>
                         )}
                       </div>
@@ -837,6 +886,19 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                 </div>
 
                 <div className="sm:col-span-2">
+                  <label htmlFor="note" className="block text-sm font-medium text-gray-700">
+                    Note (Optional)
+                  </label>
+                  <textarea
+                    name="note"
+                    id="note"
+                    rows={3}
+                    defaultValue={editingInterview?.note || ''}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
                   <label htmlFor="script" className="block text-sm font-medium text-gray-700">
                     Interview Script (Optional)
                   </label>
@@ -844,13 +906,9 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     name="script"
                     id="script"
                     rows={6}
-                    placeholder="Enter interview questions, answers, or conversation script..."
                     defaultValue={editingInterview?.script || ''}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm font-mono text-xs"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Record interview questions, answers, or full conversation transcript
-                  </p>
                 </div>
 
                 {/* Image Upload Section */}
@@ -898,19 +956,6 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     </div>
                   )}
                 </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="note" className="block text-sm font-medium text-gray-700">
-                  Additional Note (Optional)
-                </label>
-                <textarea
-                  name="note"
-                  id="note"
-                  rows={3}
-                  defaultValue={editingInterview?.note || ''}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                />
               </div>
 
               <div className="mt-6 flex justify-end space-x-3">
@@ -1035,6 +1080,147 @@ export default function InterviewsTable({ initialInterviews }: Props) {
               className="max-w-full max-h-[90vh] object-contain"
               onClick={(e) => e.stopPropagation()}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Script Analysis Modal */}
+      {scriptModalOpen && currentScript && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div 
+            className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Interview Script Analysis</h3>
+              <button
+                onClick={closeScriptModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 flex overflow-hidden relative">
+              {/* Left - Script Display */}
+              <div className="flex flex-col overflow-hidden" style={{ width: `${leftWidth}%` }}>
+                <div className="flex justify-between items-center px-6 py-3 border-b border-gray-200 bg-gray-50">
+                  <h4 className="text-sm font-semibold text-gray-700">Interview Script</h4>
+                  <button
+                    onClick={() => handleCopyScript(currentScript, 'modal')}
+                    className="text-xs px-3 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded transition-colors flex items-center gap-1"
+                  >
+                    {copiedScriptId === 'modal' ? (
+                      <>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6">
+                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
+                    {currentScript}
+                  </pre>
+                </div>
+              </div>
+
+              {/* Resize Handle */}
+              <div
+                className="w-1 bg-gray-300 hover:bg-indigo-500 cursor-col-resize transition-colors flex-shrink-0 relative group"
+                onMouseDown={handleMouseDown}
+              >
+                <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center">
+                  <div className="w-1 h-12 bg-gray-400 group-hover:bg-indigo-600 rounded-full transition-colors"></div>
+                </div>
+              </div>
+
+              {/* Right - AI Analysis */}
+              <div className="flex flex-col overflow-hidden" style={{ width: `${100 - leftWidth}%` }}>
+                <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                  <h4 className="text-sm font-semibold text-gray-700">AI Analysis</h4>
+                </div>
+                
+                {/* AI Responses */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                  {aiResponses.length === 0 ? (
+                    <div className="text-center text-gray-500 text-sm mt-8">
+                      <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                      <p className="mb-2">Ask AI to analyze this script</p>
+                      <p className="text-xs text-gray-400">e.g., "Summarize the main points"</p>
+                    </div>
+                  ) : (
+                    aiResponses.map((item, idx) => (
+                      <div key={idx} className="space-y-2">
+                        <div className="bg-indigo-100 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-indigo-900 mb-1">You asked:</p>
+                          <p className="text-sm text-indigo-800">{item.prompt}</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <p className="text-xs font-semibold text-gray-600 mb-1">AI Response:</p>
+                          <div className="text-sm text-gray-800 prose prose-sm max-w-none">
+                            <ReactMarkdown>{item.response}</ReactMarkdown>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {aiLoading && (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Prompt Input */}
+                <div className="border-t border-gray-200 p-4 bg-white">
+                  <textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    placeholder="Ask AI about this interview script..."
+                    rows={3}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mb-2"
+                  />
+                  <button
+                    onClick={handleAiAnalysis}
+                    disabled={aiLoading || !aiPrompt.trim()}
+                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Go to OpenAI
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
