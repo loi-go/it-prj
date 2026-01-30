@@ -43,6 +43,12 @@ export default async function DashboardPage() {
               <h1 className="text-xl font-bold text-gray-900">Interview Tracker</h1>
             </div>
             <div className="flex items-center space-x-4">
+            <Link
+              href="/standups"
+              className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+            >
+              Daily Standups
+            </Link>
               <Link
                 href="/interviews/all"
                 className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
