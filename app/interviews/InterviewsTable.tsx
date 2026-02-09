@@ -16,6 +16,8 @@ type Interview = {
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
   image_url: string | null
   script: string | null
+  created_at: string
+  updated_at: string
 }
 
 type GroupedInterview = {
@@ -27,6 +29,22 @@ type GroupedInterview = {
 
 type Props = {
   initialInterviews: Interview[]
+}
+
+// Helper function for compound sorting: interview_date desc, then updated_at desc
+const sortInterviewsByDateAndUpdated = (a: Interview, b: Interview) => {
+  const dateA = new Date(a.interview_date).getTime()
+  const dateB = new Date(b.interview_date).getTime()
+  
+  // First, sort by interview_date (descending - newest first)
+  if (dateA !== dateB) {
+    return dateB - dateA
+  }
+  
+  // If interview_date is the same, sort by updated_at (descending - most recently updated first)
+  const updatedA = new Date(a.updated_at).getTime()
+  const updatedB = new Date(b.updated_at).getTime()
+  return updatedB - updatedA
 }
 
 export default function InterviewsTable({ initialInterviews }: Props) {
@@ -103,9 +121,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
     // Check which groups have the matching status in their latest interview
     Object.entries(grouped).forEach(([key, interviews]) => {
-      const latest = interviews.sort(
-        (a, b) => new Date(b.interview_date).getTime() - new Date(a.interview_date).getTime()
-      )[0]
+      const latest = interviews.sort(sortInterviewsByDateAndUpdated)[0]
       if (latest.state === filterStatus) {
         companyGroupsWithStatus.add(key)
       }
@@ -141,9 +157,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     if (existing) {
       existing.interviews.push(interview)
       // Update latest status (most recent interview)
-      const sortedInterviews = existing.interviews.sort(
-        (a, b) => new Date(b.interview_date).getTime() - new Date(a.interview_date).getTime()
-      )
+      const sortedInterviews = existing.interviews.sort(sortInterviewsByDateAndUpdated)
       existing.latestStatus = sortedInterviews[0].state
     } else {
       acc.push({
@@ -657,9 +671,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
             const sortedInterviews = [...group.interviews].sort(
               (a, b) => new Date(a.interview_date).getTime() - new Date(b.interview_date).getTime()
             )
-            const latestInterview = [...group.interviews].sort(
-              (a, b) => new Date(b.interview_date).getTime() - new Date(a.interview_date).getTime()
-            )[0]
+            const latestInterview = [...group.interviews].sort(sortInterviewsByDateAndUpdated)[0]
 
             return (
               <div key={key} className="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200 hover:border-indigo-300 transition-all">

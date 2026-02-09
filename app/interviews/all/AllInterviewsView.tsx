@@ -15,6 +15,8 @@ type Interview = {
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
   image_url: string | null
   script: string | null
+  created_at: string
+  updated_at: string
   profiles: {
     name: string
   } | null
@@ -30,6 +32,22 @@ type GroupedInterview = {
 
 type Props = {
   initialInterviews: Interview[]
+}
+
+// Helper function for compound sorting: interview_date desc, then updated_at desc
+const sortInterviewsByDateAndUpdated = (a: Interview, b: Interview) => {
+  const dateA = new Date(a.interview_date).getTime()
+  const dateB = new Date(b.interview_date).getTime()
+  
+  // First, sort by interview_date (descending - newest first)
+  if (dateA !== dateB) {
+    return dateB - dateA
+  }
+  
+  // If interview_date is the same, sort by updated_at (descending - most recently updated first)
+  const updatedA = new Date(a.updated_at).getTime()
+  const updatedB = new Date(b.updated_at).getTime()
+  return updatedB - updatedA
 }
 
 export default function AllInterviewsView({ initialInterviews }: Props) {
@@ -118,9 +136,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
     }, {} as Record<string, Interview[]>)
 
     Object.entries(grouped).forEach(([key, interviews]) => {
-      const latest = interviews.sort(
-        (a, b) => new Date(b.interview_date).getTime() - new Date(a.interview_date).getTime()
-      )[0]
+      const latest = interviews.sort(sortInterviewsByDateAndUpdated)[0]
       if (latest.state === filterStatus) {
         companyGroupsWithStatus.add(key)
       }
@@ -154,9 +170,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
     
     if (existing) {
       existing.interviews.push(interview)
-      const sortedInterviews = existing.interviews.sort(
-        (a, b) => new Date(b.interview_date).getTime() - new Date(a.interview_date).getTime()
-      )
+      const sortedInterviews = existing.interviews.sort(sortInterviewsByDateAndUpdated)
       existing.latestStatus = sortedInterviews[0].state
     } else {
       acc.push({

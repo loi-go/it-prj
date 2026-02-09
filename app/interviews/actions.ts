@@ -18,6 +18,7 @@ export async function getInterviews() {
     .select('*')
     .eq('user_id', user.id)
     .order('interview_date', { ascending: false })
+    .order('updated_at', { ascending: false })
 
   if (error) {
     return { error: error.message }
@@ -40,6 +41,7 @@ export async function getAllInterviews() {
     .from('interviews')
     .select('*')
     .order('interview_date', { ascending: false })
+    .order('updated_at', { ascending: false })
 
   if (interviewsError) {
     console.error('Error fetching interviews:', interviewsError)

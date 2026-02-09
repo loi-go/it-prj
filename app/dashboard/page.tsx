@@ -33,6 +33,7 @@ export default async function DashboardPage() {
     .select('*')
     .eq('user_id', user.id)
     .order('interview_date', { ascending: false })
+    .order('updated_at', { ascending: false })
 
   return (
     <div className="min-h-screen bg-gray-50">
