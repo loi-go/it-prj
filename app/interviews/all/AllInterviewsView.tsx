@@ -554,7 +554,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                             {interview.note && (
                               <div className="mt-2">
                                 <p className="text-xs font-semibold text-gray-500 mb-1">Note:</p>
-                                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300">
+                                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300 whitespace-pre-wrap">
                                   {interview.note}
                                 </p>
                               </div>
