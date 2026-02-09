@@ -1,13 +1,15 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getAllInterviews } from '../actions'
-import { signout } from '@/app/auth/actions'
-import AllInterviewsView from './AllInterviewsView'
+import { signout } from '../auth/actions'
+import InterviewsTable from './InterviewsTable'
 import Link from 'next/link'
 
-export default async function AllInterviewsPage() {
+export default async function InterviewsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/auth/signin')
@@ -20,11 +22,18 @@ export default async function AllInterviewsPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile?.verified) {
-    redirect('/auth/signin?error=Please wait for admin verification')
+  if (!profile || !profile.verified) {
+    await supabase.auth.signOut()
+    redirect('/auth/signin')
   }
 
-  const result = await getAllInterviews()
+  // Fetch user's interviews
+  const { data: interviews } = await supabase
+    .from('interviews')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('interview_date', { ascending: false })
+    .order('updated_at', { ascending: false })
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,13 +61,13 @@ export default async function AllInterviewsPage() {
               <div className="flex space-x-4">
                 <Link
                   href="/interviews"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
                 >
                   Mine
                 </Link>
                 <Link
                   href="/interviews/all"
-                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
                 >
                   All
                 </Link>
@@ -81,10 +90,9 @@ export default async function AllInterviewsPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <AllInterviewsView initialInterviews={result.data || []} />
+          <InterviewsTable initialInterviews={interviews || []} />
         </div>
       </main>
     </div>
   )
 }
-

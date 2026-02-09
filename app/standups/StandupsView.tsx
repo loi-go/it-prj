@@ -5,6 +5,7 @@ import { getMyStandups, getAllStandups, createOrUpdateStandup, deleteStandup, ty
 
 type Props = {
   currentUserId: string
+  initialViewMode?: 'all' | 'mine'
 }
 
 // Spinner Component
@@ -12,8 +13,8 @@ const Spinner = () => (
   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
 )
 
-export default function StandupsView({ currentUserId }: Props) {
-  const [viewMode, setViewMode] = useState<'all' | 'mine'>('mine')
+export default function StandupsView({ currentUserId, initialViewMode = 'mine' }: Props) {
+  const [viewMode, setViewMode] = useState<'all' | 'mine'>(initialViewMode)
   const [standups, setStandups] = useState<DailyStandup[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -218,53 +219,21 @@ export default function StandupsView({ currentUserId }: Props) {
 
   return (
     <div>
-      {/* Header with Toggle */}
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Daily Standups</h2>
+        <h2 className="text-2xl font-bold text-gray-900">
+          {viewMode === 'mine' ? 'My Daily Standups' : 'All Daily Standups'}
+        </h2>
         
-        <div className="flex items-center gap-4">
-          {/* All/Mine Toggle */}
-          <div className="flex items-center bg-white rounded-lg shadow p-1">
-            <button
-              onClick={() => setViewMode('mine')}
-              disabled={loading}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                viewMode === 'mine'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              } disabled:opacity-50`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Mine
-            </button>
-            <button
-              onClick={() => setViewMode('all')}
-              disabled={loading}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                viewMode === 'all'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              } disabled:opacity-50`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              All
-            </button>
-          </div>
-
-          {/* Add Button - Only show in "Mine" mode */}
-          {viewMode === 'mine' && (
-            <button
-              onClick={openCreateModal}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              + Add Today's Standup
-            </button>
-          )}
-        </div>
+        {/* Add Button - Only show in "Mine" mode */}
+        {viewMode === 'mine' && (
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            + Add Today's Standup
+          </button>
+        )}
       </div>
 
       {/* Standups List */}

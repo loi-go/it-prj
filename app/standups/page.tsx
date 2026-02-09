@@ -29,29 +29,37 @@ export default async function StandupsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center space-x-8">
-              <h1 className="text-xl font-bold text-gray-900">Interview Tracker</h1>
-              <div className="flex space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-                >
-                  My Interviews
-                </Link>
-                <Link
-                  href="/interviews/all"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-                >
-                  All Interviews
-                </Link>
+              <h1 className="text-xl font-bold text-gray-900">3R</h1>
+              <div className="flex space-x-6">
                 <Link
                   href="/standups"
                   className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
                 >
                   Daily Standups
                 </Link>
+                <Link
+                  href="/interviews"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                >
+                  Interviews
+                </Link>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
+              <div className="flex space-x-4">
+                <Link
+                  href="/standups"
+                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
+                >
+                  Mine
+                </Link>
+                <Link
+                  href="/standups/all"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                >
+                  All
+                </Link>
+              </div>
               <span className="text-sm text-gray-700">
                 {user.user_metadata?.name || user.email}
               </span>
@@ -70,7 +78,7 @@ export default async function StandupsPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <StandupsView currentUserId={user.id} />
+          <StandupsView currentUserId={user.id} initialViewMode="mine" />
         </div>
       </main>
     </div>
