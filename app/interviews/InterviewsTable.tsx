@@ -499,14 +499,14 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                 <label htmlFor="filterCompany" className="block text-sm font-semibold text-gray-700 mb-2">
                   Company
                 </label>
-                <input
-                  type="text"
-                  id="filterCompany"
-                  placeholder="Search..."
-                  value={filterCompany}
-                  onChange={(e) => setFilterCompany(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                />
+                  <input
+                    type="text"
+                    id="filterCompany"
+                    placeholder="Search..."
+                    value={filterCompany}
+                    onChange={(e) => setFilterCompany(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  />
               </div>
 
               {/* Status Dropdown */}
@@ -514,12 +514,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                 <label htmlFor="filterStatus" className="block text-sm font-semibold text-gray-700 mb-2">
                   Status
                 </label>
-                <select
-                  id="filterStatus"
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                >
+                  <select
+                    id="filterStatus"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  >
                   <option value="">All</option>
                   <option value="Ongoing">Ongoing</option>
                   <option value="Offer">Offer</option>
@@ -538,14 +538,14 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     placeholder="From"
                     value={filterDateFrom}
                     onChange={(e) => setFilterDateFrom(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
                   />
                   <input
                     type="date"
                     placeholder="To"
                     value={filterDateTo}
                     onChange={(e) => setFilterDateTo(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
                   />
                 </div>
               </div>
@@ -849,7 +849,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     required
                     placeholder="e.g., david, matthew"
                     defaultValue={editingInterview?.profile}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
                   />
                 </div>
 
@@ -864,7 +864,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     required
                     placeholder="e.g., Google, Apple, Facebook"
                     defaultValue={editingInterview?.company}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
                   />
                 </div>
 
@@ -879,7 +879,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     required
                     placeholder="e.g., Phone Screen, Technical, Final"
                     defaultValue={editingInterview?.step}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
                   />
                 </div>
 
@@ -893,7 +893,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     id="interview_date"
                     required
                     defaultValue={editingInterview?.interview_date || new Date().toISOString().split('T')[0]}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
                   />
                 </div>
 
@@ -906,7 +906,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     id="note"
                     rows={3}
                     defaultValue={editingInterview?.note || ''}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
                   />
                 </div>
 
@@ -919,7 +919,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     id="script"
                     rows={6}
                     defaultValue={editingInterview?.script || ''}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm font-mono text-xs"
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm font-mono text-xs text-gray-900 bg-white"
                   />
                 </div>
 
@@ -1209,7 +1209,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     onChange={(e) => setAiPrompt(e.target.value)}
                     placeholder="Ask AI about this interview script..."
                     rows={3}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mb-2"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mb-2 text-gray-900 bg-white"
                   />
                   <button
                     onClick={handleAiAnalysis}

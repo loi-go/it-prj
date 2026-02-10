@@ -376,14 +376,14 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                 <label htmlFor="filterCompany" className="block text-sm font-semibold text-gray-700 mb-2">
                   Company
                 </label>
-                <input
-                  type="text"
-                  id="filterCompany"
-                  placeholder="Search..."
-                  value={filterCompany}
-                  onChange={(e) => setFilterCompany(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                />
+                  <input
+                    type="text"
+                    id="filterCompany"
+                    placeholder="Search..."
+                    value={filterCompany}
+                    onChange={(e) => setFilterCompany(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  />
               </div>
 
               {/* Status Dropdown */}
@@ -391,12 +391,12 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                 <label htmlFor="filterStatus" className="block text-sm font-semibold text-gray-700 mb-2">
                   Status
                 </label>
-                <select
-                  id="filterStatus"
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                >
+                  <select
+                    id="filterStatus"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  >
                   <option value="">All</option>
                   <option value="Ongoing">Ongoing</option>
                   <option value="Offer">Offer</option>
@@ -415,14 +415,14 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                     placeholder="From"
                     value={filterDateFrom}
                     onChange={(e) => setFilterDateFrom(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
                   />
                   <input
                     type="date"
                     placeholder="To"
                     value={filterDateTo}
                     onChange={(e) => setFilterDateTo(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
                   />
                 </div>
               </div>
@@ -739,7 +739,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                     onChange={(e) => setAiPrompt(e.target.value)}
                     placeholder="Ask AI about this interview script..."
                     rows={3}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mb-2"
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mb-2 text-gray-900 bg-white"
                   />
                   <button
                     onClick={handleAiAnalysis}
