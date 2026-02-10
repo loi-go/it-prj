@@ -368,7 +368,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                   id="standup_date"
                   value={standupDate}
                   onChange={(e) => setStandupDate(e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
                 />
               </div>
 
@@ -411,7 +411,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                         value={item.title}
                         onChange={(e) => updateItemTitle(itemIndex, e.target.value)}
                         placeholder="e.g., Completed Tasks, Today's Goals, Blockers"
-                        className="block w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        className="block w-full rounded-md border border-gray-300 px-3 py-2 bg-white focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900"
                       />
                     </div>
 
@@ -437,7 +437,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                             value={subtitle.subtitle}
                             onChange={(e) => updateSubtitle(itemIndex, subIndex, e.target.value)}
                             placeholder="e.g., Backend Development, Bug Fixes"
-                            className="block w-full rounded-md border border-gray-300 px-2 py-1 text-sm mb-2"
+                            className="block w-full rounded-md border border-gray-300 px-2 py-1 text-sm mb-2 text-gray-900 bg-white"
                           />
 
                           {/* Contents under this subtitle */}
@@ -450,7 +450,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                                   value={content.text}
                                   onChange={(e) => updateSubtitleContent(itemIndex, subIndex, contentIndex, e.target.value)}
                                   placeholder="Content item"
-                                  className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm"
+                                  className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900 bg-white"
                                 />
                                 {subtitle.contents.length > 1 && (
                                   <button
@@ -499,7 +499,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                               value={content.text}
                               onChange={(e) => updateDirectContent(itemIndex, contentIndex, e.target.value)}
                               placeholder="Content item"
-                              className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm"
+                              className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-900 bg-white"
                             />
                             {item.contents.length > 1 && (
                               <button
