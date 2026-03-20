@@ -175,7 +175,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                 {isToday ? 'Today' : formatDate(standup.standup_date)}
               </p>
               {isToday && (
-                <p className="text-xs text-gray-400 mt-0.5">{formatDate(standup.standup_date)}</p>
+                <p className="text-xs text-gray-400 mt-0.5 text-gray-900 bg-white">{formatDate(standup.standup_date)}</p>
               )}
               {viewMode === 'all' && standup.profiles && (
                 <p className="text-sm text-gray-500 mt-0.5">by {standup.profiles.name}</p>
@@ -322,7 +322,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                     : editingStandup?.followup ? 'Edit Follow-up' : 'Submit Follow-up'
                   }
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-400 mt-0.5 text-gray-900 bg-white">
                   {editingStandup ? formatDate(editingStandup.standup_date) : formatDate(standupDate)}
                 </p>
               </div>
@@ -348,7 +348,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
               )}
 
               <div className="mb-5">
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                <label className="block text-xs font-medium text-gray-500 mb-1.5 text-gray-900 bg-white">
                   {formType === 'plan' ? 'What do you plan to do today?' : 'How did it go?'}
                 </label>
                 <textarea
@@ -357,7 +357,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                   placeholder={formType === 'plan' ? 'Write your plan for the day...' : 'Write your end-of-day follow-up...'}
                   rows={6}
                   autoFocus
-                  className="block w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm bg-gray-50 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none leading-relaxed"
+                  className="block w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm bg-gray-50 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none leading-relaxed text-gray-900 bg-white"
                 />
               </div>
 
