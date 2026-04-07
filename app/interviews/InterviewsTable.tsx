@@ -669,7 +669,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
             const key = `${group.profile}-${group.company}`
             const isExpanded = expandedCards.has(key)
             const sortedInterviews = [...group.interviews].sort(
-              (a, b) => new Date(a.interview_date).getTime() - new Date(b.interview_date).getTime()
+              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
             )
             const latestInterview = [...group.interviews].sort(sortInterviewsByDateAndUpdated)[0]
 
@@ -773,7 +773,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         {interview.note && (
                           <div className="mt-2">
                             <p className="text-xs font-semibold text-gray-500 mb-1">Note:</p>
-                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border-l-4 border-indigo-300 whitespace-pre-wrap">
+                            <p className="text-sm text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 whitespace-pre-wrap">
                               {interview.note}
                             </p>
                           </div>
