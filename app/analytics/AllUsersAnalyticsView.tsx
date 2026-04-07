@@ -34,6 +34,8 @@ type UserAnalytics = {
   userName: string
   totalInterviews: number
   totalCompanies: number
+  /** (totalInterviews / totalCompanies) × 100 when companies > 0 */
+  interviewsPerCompanyTimes100: number
   firstInterviewPassRate: number
 }
 
@@ -225,11 +227,17 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
             ? Math.round((firstInterviewsPassed / totalFirstInterviews) * 100)
             : 0
 
+          const interviewsPerCompanyTimes100 =
+            uniqueCompanies > 0
+              ? Math.round((totalInterviews / uniqueCompanies) * 100)
+              : 0
+
           analytics.push({
             userId,
             userName,
             totalInterviews,
             totalCompanies: uniqueCompanies,
+            interviewsPerCompanyTimes100,
             firstInterviewPassRate
           })
         })
@@ -444,12 +452,32 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
     )
   }
 
+  const teamTotalInterviews = interviews.length
+  const teamUniqueCompanies = new Set(interviews.map((i) => i.company)).size
+  const teamInterviewsPerCompanyTimes100 =
+    teamUniqueCompanies > 0
+      ? Math.round((teamTotalInterviews / teamUniqueCompanies) * 100)
+      : 0
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Analytics</h1>
-        <p className="text-gray-600">Interview performance overview for all team members</p>  
+        <p className="text-gray-600">Interview performance overview for all team members</p>
+        {interviews.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2 pt-4 border-t border-gray-100">
+            <p className="text-sm text-gray-500">
+              All interviews / companies × 100
+            </p>
+            <p className="text-2xl font-bold text-indigo-600 tabular-nums">
+              {teamInterviewsPerCompanyTimes100}
+            </p>
+            <span className="text-sm text-gray-400">
+              ({teamTotalInterviews} interviews · {teamUniqueCompanies} companies)
+            </span>
+          </div>
+        )}
       </div>
 
       {/* User Cards */}
@@ -504,14 +532,19 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
               {/* Summary Text */}
               <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
                 <p className="text-gray-800 text-sm leading-relaxed font-medium">
-                  <span className="inline-flex items-center gap-1">
+                  <span className="inline-flex items-center gap-1 flex-wrap">
                     <span className="font-bold text-blue-600 text-lg">{user.totalInterviews}</span>
                     <span className="text-gray-600">interviews with</span>
-                  </span>
-                  <br />
-                  <span className="inline-flex items-center gap-1">
                     <span className="font-bold text-purple-600 text-lg">{user.totalCompanies}</span>
                     <span className="text-gray-600">companies</span>
+                  </span>
+                  <span className="mt-3 block pt-3 border-t border-blue-100/80">
+                    <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">
+                      (interviews ÷ companies) × 100
+                    </span>
+                    <span className="mt-1 block font-bold text-indigo-600 text-2xl tabular-nums">
+                      {user.interviewsPerCompanyTimes100}
+                    </span>
                   </span>
                 </p>
               </div>
