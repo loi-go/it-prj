@@ -43,6 +43,12 @@ export default async function StandupsPage() {
                 >
                   Interviews
                 </Link>
+                <Link
+                  href="/analytics"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                >
+                  Analytics
+                </Link>
               </div>
             </div>
             <div className="flex items-center space-x-6">

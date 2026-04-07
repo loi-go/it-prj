@@ -1,12 +1,15 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { signout } from '@/app/auth/actions'
-import StandupsView from '../StandupsView'
+import { signout } from '../auth/actions'
+import AllUsersAnalyticsView from './AllUsersAnalyticsView'
 import Link from 'next/link'
 
-export default async function AllStandupsPage() {
+export default async function AnalyticsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/auth/signin')
@@ -19,9 +22,29 @@ export default async function AllStandupsPage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile?.verified) {
-    redirect('/auth/signin?error=Please wait for admin verification')
+  if (!profile || !profile.verified) {
+    await supabase.auth.signOut()
+    redirect('/auth/signin')
   }
+
+  // Fetch all interviews
+  const { data: interviews, error: interviewsError } = await supabase
+    .from('interviews')
+    .select('*')
+    .order('interview_date', { ascending: false })
+    .order('updated_at', { ascending: false })
+
+  // Fetch all profiles
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, name')
+    .eq('verified', true)
+
+  // Log for debugging
+  console.log('Interviews data:', interviews?.length || 0, 'interviews')
+  console.log('Profiles data:', profiles?.length || 0, 'profiles')
+  if (interviewsError) console.log('Interviews error:', interviewsError)
+  if (profilesError) console.log('Profiles error:', profilesError)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -33,7 +56,7 @@ export default async function AllStandupsPage() {
               <div className="flex space-x-6">
                 <Link
                   href="/standups"
-                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
                 >
                   Daily Standups
                 </Link>
@@ -45,27 +68,13 @@ export default async function AllStandupsPage() {
                 </Link>
                 <Link
                   href="/analytics"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
                 >
                   Analytics
                 </Link>
               </div>
             </div>
             <div className="flex items-center space-x-6">
-              <div className="flex space-x-4">
-                <Link
-                  href="/standups"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
-                >
-                  Mine
-                </Link>
-                <Link
-                  href="/standups/all"
-                  className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600"
-                >
-                  All
-                </Link>
-              </div>
               <span className="text-sm text-gray-700">
                 {user.user_metadata?.name || user.email}
               </span>
@@ -84,7 +93,10 @@ export default async function AllStandupsPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <StandupsView currentUserId={user.id} initialViewMode="all" />
+          <AllUsersAnalyticsView 
+            interviews={interviews || []} 
+            profiles={profiles || []}
+          />
         </div>
       </main>
     </div>
