@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS public.interviews (
   step TEXT NOT NULL, -- e.g., "Phone Screen", "Technical", "Final"
   interview_date DATE NOT NULL,
   note TEXT,
-  state TEXT DEFAULT 'Ongoing' NOT NULL CHECK (state IN ('Ongoing', 'Rejected', 'Offer')),
+  state TEXT DEFAULT 'Ongoing' NOT NULL CHECK (state IN ('Ongoing', 'Rejected', 'Offer', 'None')),
   interview_type TEXT CHECK (interview_type IN ('Remote', 'Onsite', 'Hybrid')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL

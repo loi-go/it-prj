@@ -12,7 +12,7 @@ type Interview = {
   step: string
   interview_date: string
   note: string | null
-  state: 'Ongoing' | 'Rejected' | 'Offer'
+  state: 'Ongoing' | 'Rejected' | 'Offer' | 'None' | null
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
   image_url: string | null
   script: string | null
@@ -24,7 +24,7 @@ type GroupedInterview = {
   profile: string
   company: string
   interviews: Interview[]
-  latestStatus: 'Ongoing' | 'Rejected' | 'Offer'
+  latestStatus: Interview['state']
 }
 
 type Props = {
@@ -314,7 +314,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     setStatusChangeInterview(null)
   }
 
-  const handleStatusChange = async (newStatus: 'Ongoing' | 'Rejected' | 'Offer') => {
+  const handleStatusChange = async (newStatus: 'Ongoing' | 'Rejected' | 'Offer' | 'None') => {
     if (!statusChangeInterview) return
     
     setLoading(true)
@@ -362,7 +362,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
     // Set default values
     if (editingInterview) {
-      formData.append('state', editingInterview.state)
+      formData.append('state', editingInterview.state || 'Ongoing')
       formData.append('interview_type', editingInterview.interview_type || 'Remote')
     } else {
       formData.append('state', 'Ongoing')
@@ -413,7 +413,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     }
   }
 
-  const getStateColor = (state: string) => {
+  const getStateColor = (state: string | null) => {
     switch (state) {
       case 'Ongoing':
         return 'bg-blue-100 text-blue-800'
@@ -422,7 +422,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
       case 'Rejected':
         return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-500'
     }
   }
 
@@ -524,6 +524,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   <option value="Ongoing">Ongoing</option>
                   <option value="Offer">Offer</option>
                   <option value="Rejected">Rejected</option>
+                  <option value="None">No Status</option>
                 </select>
               </div>
 
@@ -1042,6 +1043,18 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   } disabled:opacity-50`}
                 >
                   <span className="font-medium text-gray-900">Rejected</span>
+                </button>
+
+                <button
+                  onClick={() => handleStatusChange('None')}
+                  disabled={loading}
+                  className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
+                    !statusChangeInterview.state || statusChangeInterview.state === 'None'
+                      ? 'border-gray-500 bg-gray-50'
+                      : 'border-gray-200 hover:border-gray-400'
+                  } disabled:opacity-50`}
+                >
+                  <span className="font-medium text-gray-900">No Status</span>
                 </button>
               </div>
             </div>

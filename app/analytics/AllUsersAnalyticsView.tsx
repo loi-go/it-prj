@@ -11,7 +11,7 @@ type Interview = {
   step: string
   interview_date: string
   note: string | null
-  state: 'Ongoing' | 'Rejected' | 'Offer'
+  state: 'Ongoing' | 'Rejected' | 'Offer' | 'None' | null
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
   image_url: string | null
   script: string | null
@@ -214,12 +214,17 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
             })
             
             const latestInterview = sortedInterviews[sortedInterviews.length - 1]
-            
-            totalFirstInterviews++
-            
-            // Check if they progressed beyond the first interview
-            if (sortedInterviews.length > 1 || latestInterview.state === 'Offer') {
-              firstInterviewsPassed++
+
+            // Only count towards pass-rate if we have a meaningful
+            // final status (exclude "None" and null from both
+            // numerator and denominator).
+            if (latestInterview.state && latestInterview.state !== 'None') {
+              totalFirstInterviews++
+
+              // Check if they progressed beyond the first interview
+              if (sortedInterviews.length > 1 || latestInterview.state === 'Offer') {
+                firstInterviewsPassed++
+              }
             }
           })
 
@@ -325,9 +330,11 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
           
           const firstInterviewDate = new Date(firstInterview.interview_date)
           if (firstInterviewDate >= weekStart && firstInterviewDate <= weekEnd) {
-            firstInterviews++
-            if (sortedInterviews.length > 1 || latestInterview.state === 'Offer') {
-              firstInterviewsPassed++
+            if (latestInterview.state && latestInterview.state !== 'None') {
+              firstInterviews++
+              if (sortedInterviews.length > 1 || latestInterview.state === 'Offer') {
+                firstInterviewsPassed++
+              }
             }
           }
           
@@ -396,9 +403,11 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
           
           const firstInterviewDate = new Date(firstInterview.interview_date)
           if (firstInterviewDate >= monthStart && firstInterviewDate <= monthEnd) {
-            firstInterviews++
-            if (sortedInterviews.length > 1 || latestInterview.state === 'Offer') {
-              firstInterviewsPassed++
+            if (latestInterview.state && latestInterview.state !== 'None') {
+              firstInterviews++
+              if (sortedInterviews.length > 1 || latestInterview.state === 'Offer') {
+                firstInterviewsPassed++
+              }
             }
           }
           

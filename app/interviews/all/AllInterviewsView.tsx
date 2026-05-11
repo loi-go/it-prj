@@ -11,7 +11,7 @@ type Interview = {
   step: string
   interview_date: string
   note: string | null
-  state: 'Ongoing' | 'Rejected' | 'Offer'
+  state: 'Ongoing' | 'Rejected' | 'Offer' | 'None' | null
   interview_type: 'Remote' | 'Onsite' | 'Hybrid' | null
   image_url: string | null
   script: string | null
@@ -27,7 +27,7 @@ type GroupedInterview = {
   profile: string
   company: string
   interviews: Interview[]
-  latestStatus: 'Ongoing' | 'Rejected' | 'Offer'
+  latestStatus: Interview['state']
 }
 
 type Props = {
@@ -195,7 +195,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
     setExpandedCards(newExpanded)
   }
 
-  const getStateColor = (state: string) => {
+  const getStateColor = (state: string | null) => {
     switch (state) {
       case 'Ongoing':
         return 'bg-blue-100 text-blue-800'
@@ -204,7 +204,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
       case 'Rejected':
         return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-500'
     }
   }
 
@@ -401,6 +401,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                   <option value="Ongoing">Ongoing</option>
                   <option value="Offer">Offer</option>
                   <option value="Rejected">Rejected</option>
+                  <option value="None">No Status</option>
                 </select>
               </div>
 
