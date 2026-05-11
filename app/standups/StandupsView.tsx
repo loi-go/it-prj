@@ -161,6 +161,23 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
   const todayStandup = standups.find(s => s.standup_date === today)
   const pastStandups = standups.filter(s => s.standup_date !== today)
 
+  // For the "All" view, group standups by date so that each
+  // day is rendered together under a date heading.
+  const groupedAllStandupsByDate =
+    viewMode === 'all'
+      ? standups.reduce<{ date: string; items: DailyStandup[] }[]>((groups, standup) => {
+          const lastGroup = groups[groups.length - 1]
+
+          if (!lastGroup || lastGroup.date !== standup.standup_date) {
+            groups.push({ date: standup.standup_date, items: [standup] })
+          } else {
+            lastGroup.items.push(standup)
+          }
+
+          return groups
+        }, [])
+      : []
+
   const renderStandupCard = (standup: DailyStandup, isToday = false) => {
     const hasFollowup = standup.followup && standup.followup.trim().length > 0
     const isMine = viewMode === 'mine'
@@ -296,15 +313,28 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                 <p className="text-gray-500">No standups yet.</p>
               </div>
             )
-          ) : (
+          ) : viewMode === 'mine' ? (
             <>
-              {viewMode === 'mine' && pastStandups.length > 0 && (
+              {pastStandups.length > 0 && (
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Past</h3>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {(viewMode === 'mine' ? pastStandups : standups).map(s => renderStandupCard(s, false))}
+                {pastStandups.map(s => renderStandupCard(s, false))}
               </div>
             </>
+          ) : (
+            <div className="space-y-6">
+              {groupedAllStandupsByDate.map(group => (
+                <section key={group.date}>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                    {group.date === today ? 'Today' : formatDate(group.date)}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {group.items.map(s => renderStandupCard(s, group.date === today))}
+                  </div>
+                </section>
+              ))}
+            </div>
           )}
         </>
       )}
