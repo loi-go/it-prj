@@ -13,10 +13,18 @@ CREATE TABLE IF NOT EXISTS public.daily_standups (
 ALTER TABLE public.daily_standups ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
-CREATE POLICY "Users can view all standups"
+CREATE POLICY "Users can view standups from signup"
   ON public.daily_standups
   FOR SELECT
-  USING (auth.uid() IS NOT NULL);
+  USING (
+    auth.uid() IS NOT NULL
+    AND EXISTS (
+      SELECT 1
+      FROM public.profiles p
+      WHERE p.id = auth.uid()
+        AND public.daily_standups.standup_date >= DATE(p.created_at)
+    )
+  );
 
 CREATE POLICY "Users can insert own standups"
   ON public.daily_standups

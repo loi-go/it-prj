@@ -38,9 +38,33 @@ export async function getAllStandups() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  const { data: standupsData, error: standupsError } = await supabase
+  // Get the current user's signup date (via profile) so we only
+  // show standups from on/after that date to this user.
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('created_at')
+    .eq('id', user.id)
+    .single()
+
+  if (profileError) return { error: profileError.message }
+
+  let standupsQuery = supabase
     .from('daily_standups')
     .select('id, user_id, standup_date, plan, followup, created_at, updated_at')
+
+  // If we have a profile creation date, filter out standups that
+  // are older than when this user signed up.
+  if (profile?.created_at) {
+    const createdAtDate = new Date(profile.created_at)
+    const year = createdAtDate.getUTCFullYear()
+    const month = String(createdAtDate.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(createdAtDate.getUTCDate()).padStart(2, '0')
+    const signupDate = `${year}-${month}-${day}`
+
+    standupsQuery = standupsQuery.gte('standup_date', signupDate)
+  }
+
+  const { data: standupsData, error: standupsError } = await standupsQuery
     .order('standup_date', { ascending: false })
 
   if (standupsError) return { error: standupsError.message }
