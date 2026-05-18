@@ -63,7 +63,7 @@ export async function signin(formData: FormData) {
   // Check if user is verified
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('verified')
+    .select('verified, disabled')
     .eq('id', authData.user.id)
     .single()
 
@@ -71,6 +71,11 @@ export async function signin(formData: FormData) {
     // Sign out the user
     await supabase.auth.signOut()
     return { error: 'Account verification pending. Please contact admin.' }
+  }
+
+  if (profile.disabled) {
+    await supabase.auth.signOut()
+    return { error: 'Your account has been disabled. Contact an administrator.' }
   }
 
   if (!profile.verified) {

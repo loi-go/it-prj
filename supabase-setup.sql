@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   name TEXT NOT NULL,
   verified BOOLEAN DEFAULT false NOT NULL,
+  is_admin BOOLEAN DEFAULT false NOT NULL,
+  disabled BOOLEAN DEFAULT false NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -21,6 +23,7 @@ DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can view all profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Admins can update any profile" ON public.profiles;
 
 -- Create policy: Users can view all profiles (read-only)
 CREATE POLICY "Users can view all profiles"
@@ -39,6 +42,24 @@ CREATE POLICY "Users can insert own profile"
   ON public.profiles
   FOR INSERT
   WITH CHECK (auth.uid() = id);
+
+-- Admins may update any profile (for user management in the app)
+DROP POLICY IF EXISTS "Admins can update any profile" ON public.profiles;
+CREATE POLICY "Admins can update any profile"
+  ON public.profiles
+  FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles me
+      WHERE me.id = auth.uid() AND me.is_admin = true
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.profiles me
+      WHERE me.id = auth.uid() AND me.is_admin = true
+    )
+  );
 
 -- Function to automatically create profile when user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()

@@ -42,11 +42,13 @@ export async function getAllStandups() {
   // show standups from on/after that date to this user.
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('created_at')
+    .select('created_at, is_admin')
     .eq('id', user.id)
     .single()
 
   if (profileError) return { error: profileError.message }
+
+  const viewerIsAdmin = profile?.is_admin === true
 
   let standupsQuery = supabase
     .from('daily_standups')
@@ -71,13 +73,23 @@ export async function getAllStandups() {
 
   const { data: profilesData, error: profilesError } = await supabase
     .from('profiles')
-    .select('id, name')
+    .select('id, name, is_admin')
 
   if (profilesError) return { error: profilesError.message }
 
-  const profilesMap = new Map(profilesData?.map(p => [p.id, p.name]) || [])
+  const adminUserIds = new Set(
+    (profilesData ?? []).filter(p => p.is_admin === true).map(p => p.id)
+  )
 
-  const data: DailyStandup[] = (standupsData ?? []).map(standup => ({
+  const standupsFiltered = viewerIsAdmin
+    ? (standupsData ?? [])
+    : (standupsData ?? []).filter(s => !adminUserIds.has(s.user_id) || s.user_id === user.id)
+
+  const profilesMap = new Map(
+    (profilesData ?? []).map(p => [p.id, p.name] as const)
+  )
+
+  const data: DailyStandup[] = standupsFiltered.map(standup => ({
     ...standup,
     profiles: { name: profilesMap.get(standup.user_id) || 'Unknown' }
   }))
