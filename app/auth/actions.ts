@@ -85,7 +85,7 @@ export async function signin(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/standups')
 }
 
 export async function signout() {
