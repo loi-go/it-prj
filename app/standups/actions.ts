@@ -16,6 +16,17 @@ export type DailyStandup = {
   }
 }
 
+const STANDUPS_RECENT_DAYS = 7
+
+function getStandupsCutoffDate(days: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - (days - 1))
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export async function getMyStandups() {
   const supabase = await createClient()
 
@@ -27,6 +38,7 @@ export async function getMyStandups() {
     .select('id, user_id, standup_date, plan, followup, created_at, updated_at')
     .eq('user_id', user.id)
     .order('standup_date', { ascending: false })
+    .limit(STANDUPS_RECENT_DAYS)
 
   if (error) return { error: error.message }
   return { data: data as DailyStandup[] }
@@ -50,9 +62,9 @@ export async function getAllStandups() {
 
   const viewerIsAdmin = profile?.is_admin === true
 
-  let standupsQuery = supabase
-    .from('daily_standups')
-    .select('id, user_id, standup_date, plan, followup, created_at, updated_at')
+  const recentCutoffDate = getStandupsCutoffDate(STANDUPS_RECENT_DAYS)
+
+  let minStandupDate = recentCutoffDate
 
   // If we have a profile creation date, filter out standups that
   // are older than when this user signed up.
@@ -63,27 +75,40 @@ export async function getAllStandups() {
     const day = String(createdAtDate.getUTCDate()).padStart(2, '0')
     const signupDate = `${year}-${month}-${day}`
 
-    standupsQuery = standupsQuery.gte('standup_date', signupDate)
+    minStandupDate = signupDate > recentCutoffDate ? signupDate : recentCutoffDate
   }
 
-  const { data: standupsData, error: standupsError } = await standupsQuery
+  const { data: standupsData, error: standupsError } = await supabase
+    .from('daily_standups')
+    .select('id, user_id, standup_date, plan, followup, created_at, updated_at')
+    .gte('standup_date', minStandupDate)
     .order('standup_date', { ascending: false })
 
   if (standupsError) return { error: standupsError.message }
 
-  const { data: profilesData, error: profilesError } = await supabase
+  const { data: adminProfiles, error: adminProfilesError } = await supabase
     .from('profiles')
-    .select('id, name, is_admin')
+    .select('id')
+    .eq('is_admin', true)
 
-  if (profilesError) return { error: profilesError.message }
+  if (adminProfilesError) return { error: adminProfilesError.message }
 
-  const adminUserIds = new Set(
-    (profilesData ?? []).filter(p => p.is_admin === true).map(p => p.id)
-  )
+  const adminUserIds = new Set((adminProfiles ?? []).map(p => p.id))
 
   const standupsFiltered = viewerIsAdmin
     ? (standupsData ?? [])
     : (standupsData ?? []).filter(s => !adminUserIds.has(s.user_id) || s.user_id === user.id)
+
+  const standupUserIds = [...new Set(standupsFiltered.map(s => s.user_id))]
+
+  const { data: profilesData, error: profilesError } = standupUserIds.length > 0
+    ? await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', standupUserIds)
+    : { data: [], error: null }
+
+  if (profilesError) return { error: profilesError.message }
 
   const profilesMap = new Map(
     (profilesData ?? []).map(p => [p.id, p.name] as const)
