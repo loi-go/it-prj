@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { getMyStandups, getAllStandups, createOrUpdateStandup, submitFollowup, deleteStandup, type DailyStandup } from './actions'
+import DateRangeFilter from './DateRangeFilter'
+import {
+  getDefaultStandupDateRange,
+  getLocalDateString,
+  getStandupsCutoffDate,
+} from './utils'
 
 type Props = {
   currentUserId: string
@@ -43,17 +49,14 @@ const Md = ({ text }: { text: string }) => (
   <ReactMarkdown components={mdComponents}>{text}</ReactMarkdown>
 )
 
-const getLocalDate = () => {
-  const d = new Date()
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
+const getLocalDate = getLocalDateString
 
 export default function StandupsView({ currentUserId, initialViewMode = 'mine' }: Props) {
+  const defaultDateRange = getDefaultStandupDateRange()
   const [viewMode] = useState<'all' | 'mine'>(initialViewMode)
   const [standups, setStandups] = useState<DailyStandup[]>([])
+  const [dateFrom, setDateFrom] = useState(defaultDateRange.from)
+  const [dateTo, setDateTo] = useState(defaultDateRange.to)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -69,14 +72,29 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
 
   useEffect(() => {
     loadStandups()
-  }, [viewMode])
+  }, [viewMode, dateFrom, dateTo])
 
   const loadStandups = async () => {
     setLoading(true)
-    const result = viewMode === 'mine' ? await getMyStandups() : await getAllStandups()
+    const range = { from: dateFrom, to: dateTo }
+    const result = viewMode === 'mine' ? await getMyStandups(range) : await getAllStandups(range)
     if (result.data) setStandups(result.data)
     setLoading(false)
   }
+
+  const applyPreset = (days: number) => {
+    setDateFrom(getStandupsCutoffDate(days))
+    setDateTo(getLocalDate())
+  }
+
+  const resetDateRange = () => {
+    const defaults = getDefaultStandupDateRange()
+    setDateFrom(defaults.from)
+    setDateTo(defaults.to)
+  }
+
+  const isDateRangeActive =
+    dateFrom !== defaultDateRange.from || dateTo !== defaultDateRange.to
 
   const openPlanModal = (existing?: DailyStandup) => {
     setFormType('plan')
@@ -276,6 +294,17 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
         </h2>
       </div>
 
+      <DateRangeFilter
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
+        onPreset={applyPreset}
+        onReset={resetDateRange}
+        isActive={isDateRangeActive}
+        resultCount={standups.length}
+      />
+
       {loading && standups.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
           <div className="flex justify-center"><Spinner /></div>
@@ -307,10 +336,14 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
           {/* Past / All */}
           {(viewMode === 'mine' ? pastStandups : standups).length === 0 ? (
             viewMode === 'mine' ? (
-              <p className="text-center text-gray-400 text-sm py-4">No past standups yet.</p>
+              <p className="text-center text-gray-400 text-sm py-4">
+                {isDateRangeActive ? 'No standups in this date range.' : 'No past standups yet.'}
+              </p>
             ) : (
               <div className="bg-white rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">No standups yet.</p>
+                <p className="text-gray-500">
+                  {isDateRangeActive ? 'No standups in this date range.' : 'No standups yet.'}
+                </p>
               </div>
             )
           ) : viewMode === 'mine' ? (

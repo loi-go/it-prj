@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getDefaultStandupDateRange } from './utils'
 
 export type DailyStandup = {
   id: string
@@ -16,35 +17,39 @@ export type DailyStandup = {
   }
 }
 
-const STANDUPS_RECENT_DAYS = 7
-
-function getStandupsCutoffDate(days: number): string {
-  const d = new Date()
-  d.setDate(d.getDate() - (days - 1))
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+type StandupDateRange = {
+  from?: string
+  to?: string
 }
 
-export async function getMyStandups() {
+function resolveStandupDateRange(range?: StandupDateRange) {
+  const defaults = getDefaultStandupDateRange()
+  const from = range?.from || defaults.from
+  const to = range?.to || defaults.to
+  return from <= to ? { from, to } : { from: to, to: from }
+}
+
+export async function getMyStandups(range?: StandupDateRange) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const { from, to } = resolveStandupDateRange(range)
+
   const { data, error } = await supabase
     .from('daily_standups')
     .select('id, user_id, standup_date, plan, followup, created_at, updated_at')
     .eq('user_id', user.id)
+    .gte('standup_date', from)
+    .lte('standup_date', to)
     .order('standup_date', { ascending: false })
-    .limit(STANDUPS_RECENT_DAYS)
 
   if (error) return { error: error.message }
   return { data: data as DailyStandup[] }
 }
 
-export async function getAllStandups() {
+export async function getAllStandups(range?: StandupDateRange) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -61,10 +66,9 @@ export async function getAllStandups() {
   if (profileError) return { error: profileError.message }
 
   const viewerIsAdmin = profile?.is_admin === true
+  const { from, to } = resolveStandupDateRange(range)
 
-  const recentCutoffDate = getStandupsCutoffDate(STANDUPS_RECENT_DAYS)
-
-  let minStandupDate = recentCutoffDate
+  let minStandupDate = from
 
   // If we have a profile creation date, filter out standups that
   // are older than when this user signed up.
@@ -75,13 +79,14 @@ export async function getAllStandups() {
     const day = String(createdAtDate.getUTCDate()).padStart(2, '0')
     const signupDate = `${year}-${month}-${day}`
 
-    minStandupDate = signupDate > recentCutoffDate ? signupDate : recentCutoffDate
+    minStandupDate = signupDate > from ? signupDate : from
   }
 
   const { data: standupsData, error: standupsError } = await supabase
     .from('daily_standups')
     .select('id, user_id, standup_date, plan, followup, created_at, updated_at')
     .gte('standup_date', minStandupDate)
+    .lte('standup_date', to)
     .order('standup_date', { ascending: false })
 
   if (standupsError) return { error: standupsError.message }
