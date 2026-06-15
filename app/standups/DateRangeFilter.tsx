@@ -7,6 +7,7 @@ type Props = {
   onReset: () => void
   isActive: boolean
   resultCount: number
+  formatDateLabel: (dateString: string) => string
 }
 
 export default function DateRangeFilter({
@@ -18,6 +19,7 @@ export default function DateRangeFilter({
   onReset,
   isActive,
   resultCount,
+  formatDateLabel,
 }: Props) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
@@ -27,21 +29,33 @@ export default function DateRangeFilter({
             Date Range
           </label>
           <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="date"
-              value={dateFrom}
-              max={dateTo}
-              onChange={(e) => onDateFromChange(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
-            />
-            <span className="hidden sm:flex items-center text-sm text-gray-400 px-1">to</span>
-            <input
-              type="date"
-              value={dateTo}
-              min={dateFrom}
-              onChange={(e) => onDateToChange(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
-            />
+            <div>
+              <label htmlFor="standupDateFrom" className="block text-xs font-medium text-gray-500 mb-1">
+                From
+              </label>
+              <input
+                id="standupDateFrom"
+                type="date"
+                value={dateFrom}
+                max={dateTo}
+                onChange={(e) => onDateFromChange(e.target.value)}
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+              />
+            </div>
+            <span className="hidden sm:flex items-end pb-2 text-sm text-gray-400 px-1">to</span>
+            <div>
+              <label htmlFor="standupDateTo" className="block text-xs font-medium text-gray-500 mb-1">
+                To
+              </label>
+              <input
+                id="standupDateTo"
+                type="date"
+                value={dateTo}
+                min={dateFrom}
+                onChange={(e) => onDateToChange(e.target.value)}
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+              />
+            </div>
           </div>
         </div>
 
@@ -73,7 +87,7 @@ export default function DateRangeFilter({
       </div>
 
       <p className="mt-3 text-sm text-gray-500">
-        {resultCount} standup{resultCount === 1 ? '' : 's'} in selected range
+        {formatDateLabel(dateFrom)} – {formatDateLabel(dateTo)} · {resultCount} standup{resultCount === 1 ? '' : 's'} in selected range
       </p>
     </div>
   )

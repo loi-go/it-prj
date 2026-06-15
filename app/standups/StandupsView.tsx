@@ -8,6 +8,7 @@ import {
   getDefaultStandupDateRange,
   getLocalDateString,
   getStandupsCutoffDate,
+  formatDateLabel,
 } from './utils'
 
 type Props = {
@@ -303,6 +304,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
         onReset={resetDateRange}
         isActive={isDateRangeActive}
         resultCount={standups.length}
+        formatDateLabel={formatDateLabel}
       />
 
       {loading && standups.length === 0 ? (

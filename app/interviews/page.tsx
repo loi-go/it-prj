@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import InterviewsTable from './InterviewsTable'
 import AppNav from '@/app/components/AppNav'
+import { getInterviews } from './actions'
+import { getDefaultInterviewDateRange } from './utils'
 
 export default async function InterviewsPage() {
   const supabase = await createClient()
@@ -25,12 +27,7 @@ export default async function InterviewsPage() {
     redirect('/auth/signin')
   }
 
-  const { data: interviews } = await supabase
-    .from('interviews')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('interview_date', { ascending: false })
-    .order('updated_at', { ascending: false })
+  const result = await getInterviews(getDefaultInterviewDateRange())
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,7 +40,7 @@ export default async function InterviewsPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <InterviewsTable initialInterviews={interviews || []} />
+          <InterviewsTable initialInterviews={result.data || []} />
         </div>
       </main>
     </div>

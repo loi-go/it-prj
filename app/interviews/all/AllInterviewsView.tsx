@@ -1,8 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { analyzeInterviewScript } from '../ai-actions'
+import { getAllInterviews } from '../actions'
 import ReactMarkdown from 'react-markdown'
+import InterviewDateRangeFilter from '../InterviewDateRangeFilter'
+import InterviewFilterSummary from '../InterviewFilterSummary'
+import InterviewSpinner from '../InterviewSpinner'
+import {
+  getDefaultInterviewDateRange,
+  getInterviewDateRangeForPreset,
+  matchInterviewDatePreset,
+  type InterviewDatePreset,
+} from '../utils'
 
 type Interview = {
   id: string
@@ -51,7 +61,7 @@ const sortInterviewsByDateAndUpdated = (a: Interview, b: Interview) => {
 }
 
 export default function AllInterviewsView({ initialInterviews }: Props) {
-  const [interviews] = useState<Interview[]>(initialInterviews)
+  const [interviews, setInterviews] = useState<Interview[]>(initialInterviews)
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set())
   const [zoomImageUrl, setZoomImageUrl] = useState<string | null>(null)
   const [copiedScriptId, setCopiedScriptId] = useState<string | null>(null)
@@ -68,8 +78,44 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
   const [selectedProfiles, setSelectedProfiles] = useState<Set<string>>(new Set())
   const [filterCompany, setFilterCompany] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
-  const [filterDateFrom, setFilterDateFrom] = useState('')
-  const [filterDateTo, setFilterDateTo] = useState('')
+  const defaultDateRange = getDefaultInterviewDateRange()
+  const [filterDateFrom, setFilterDateFrom] = useState(defaultDateRange.from || '')
+  const [filterDateTo, setFilterDateTo] = useState(defaultDateRange.to || '')
+  const [loadingInterviews, setLoadingInterviews] = useState(false)
+  const skipInitialDateFetch = useRef(true)
+
+  const applyDatePreset = (preset: InterviewDatePreset) => {
+    const range = getInterviewDateRangeForPreset(preset)
+    setFilterDateFrom(range.from || '')
+    setFilterDateTo(range.to || '')
+  }
+
+  const resetFilters = () => {
+    setSelectedUser('')
+    setSelectedProfiles(new Set())
+    setFilterCompany('')
+    setFilterStatus('')
+    applyDatePreset('2m')
+  }
+
+  useEffect(() => {
+    if (skipInitialDateFetch.current) {
+      skipInitialDateFetch.current = false
+      return
+    }
+
+    const fetchInterviews = async () => {
+      setLoadingInterviews(true)
+      const result = await getAllInterviews({
+        from: filterDateFrom || undefined,
+        to: filterDateTo || undefined,
+      })
+      if (result.data) setInterviews(result.data)
+      setLoadingInterviews(false)
+    }
+
+    fetchInterviews()
+  }, [filterDateFrom, filterDateTo])
 
   // Extract unique user names
   const uniqueUserNames = Array.from(new Set(interviews.map(i => i.profiles?.name || 'Unknown'))).sort()
@@ -160,7 +206,9 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
     )
   }
 
-  const isFilterActive = selectedUser || selectedProfiles.size > 0 || filterCompany || filterStatus || filterDateFrom || filterDateTo
+  const isFilterActive = selectedUser || selectedProfiles.size > 0 || filterCompany || filterStatus ||
+    matchInterviewDatePreset(filterDateFrom, filterDateTo) !== '2m'
+  const activeDatePreset = matchInterviewDatePreset(filterDateFrom, filterDateTo)
 
   // Group interviews by userName + profile + company
   const groupedInterviews: GroupedInterview[] = filteredInterviews.reduce((acc, interview) => {
@@ -287,27 +335,39 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
       <div className="flex gap-6">
         {/* Sidebar - Filters */}
         <div className="w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg shadow p-4 sticky top-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
-              {isFilterActive && (
-                <button
-                  onClick={() => {
-                    setSelectedUser('')
-                    setSelectedProfiles(new Set())
-                    setFilterCompany('')
-                    setFilterStatus('')
-                    setFilterDateFrom('')
-                    setFilterDateTo('')
-                  }}
-                  className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
-                >
-                  Clear
-                </button>
-              )}
+          <div className="bg-white rounded-lg shadow sticky top-6 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
+            <div className="flex-shrink-0 p-4 border-b border-gray-100 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                {isFilterActive && (
+                  <button
+                    onClick={resetFilters}
+                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              <InterviewDateRangeFilter
+                dateFrom={filterDateFrom}
+                dateTo={filterDateTo}
+                activePreset={activeDatePreset}
+                onPresetSelect={applyDatePreset}
+                onDateFromChange={setFilterDateFrom}
+                onDateToChange={setFilterDateTo}
+                loading={loadingInterviews}
+              />
+
+              <InterviewFilterSummary
+                interviewCount={filteredInterviews.length}
+                companyCount={groupedInterviews.length}
+                totalInterviewCount={interviews.length}
+                loading={loadingInterviews}
+              />
             </div>
 
-            <div className="space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-6">
               {/* User Selection - Radio Buttons */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -404,44 +464,21 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                   <option value="None">No Status</option>
                 </select>
               </div>
-
-              {/* Date Range */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Date Range
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="date"
-                    placeholder="From"
-                    value={filterDateFrom}
-                    onChange={(e) => setFilterDateFrom(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
-                  />
-                  <input
-                    type="date"
-                    placeholder="To"
-                    value={filterDateTo}
-                    onChange={(e) => setFilterDateTo(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
-                  />
-                </div>
-              </div>
-
-              {/* Results Count */}
-              {isFilterActive && (
-                <div className="pt-4 border-t border-gray-200">
-                  <span className="text-sm text-gray-600 font-medium">
-                    {filteredInterviews.length} result(s)
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 relative">
+          {loadingInterviews && (
+            <div className="absolute inset-0 bg-white/75 flex items-center justify-center z-10 rounded-lg">
+              <div className="text-center">
+                <InterviewSpinner size="lg" className="mx-auto" />
+                <p className="mt-3 text-sm font-medium text-gray-700">Loading interviews...</p>
+              </div>
+            </div>
+          )}
+
           {interviews.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 text-center">
               <p className="text-gray-500">No interviews yet</p>

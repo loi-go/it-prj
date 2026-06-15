@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getAllInterviews } from '../actions'
+import { getDefaultInterviewDateRange } from '../utils'
 import AllInterviewsView from './AllInterviewsView'
 import AppNav from '@/app/components/AppNav'
 
@@ -24,7 +25,7 @@ export default async function AllInterviewsPage() {
     redirect('/auth/signin?error=Please wait for admin verification')
   }
 
-  const result = await getAllInterviews()
+  const result = await getAllInterviews(getDefaultInterviewDateRange())
 
   return (
     <div className="min-h-screen bg-gray-50">

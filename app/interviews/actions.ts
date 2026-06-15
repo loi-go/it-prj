@@ -3,8 +3,36 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import sharp from 'sharp'
+import { getInterviewCutoffDate, INTERVIEWS_DEFAULT_MONTHS, type InterviewDateRange } from './utils'
 
-export async function getInterviews() {
+function resolveInterviewDateRange(range?: InterviewDateRange) {
+  if (!range?.from && !range?.to) {
+    return { from: getInterviewCutoffDate(INTERVIEWS_DEFAULT_MONTHS), to: undefined as string | undefined }
+  }
+
+  return {
+    from: range.from,
+    to: range.to,
+  }
+}
+
+function applyInterviewDateFilters<T extends { gte: Function; lte: Function }>(
+  query: T,
+  range?: InterviewDateRange
+) {
+  const resolved = resolveInterviewDateRange(range)
+
+  if (resolved.from) {
+    query = query.gte('interview_date', resolved.from) as T
+  }
+  if (resolved.to) {
+    query = query.lte('interview_date', resolved.to) as T
+  }
+
+  return query
+}
+
+export async function getInterviews(range?: InterviewDateRange) {
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -13,10 +41,14 @@ export async function getInterviews() {
     return { error: 'Unauthorized' }
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('interviews')
     .select('*')
     .eq('user_id', user.id)
+
+  query = applyInterviewDateFilters(query, range)
+
+  const { data, error } = await query
     .order('interview_date', { ascending: false })
     .order('updated_at', { ascending: false })
 
@@ -27,7 +59,7 @@ export async function getInterviews() {
   return { data }
 }
 
-export async function getAllInterviews() {
+export async function getAllInterviews(range?: InterviewDateRange) {
   const supabase = await createClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -36,10 +68,13 @@ export async function getAllInterviews() {
     return { error: 'Unauthorized' }
   }
 
-  // Get all interviews
-  const { data: interviewsData, error: interviewsError } = await supabase
+  let query = supabase
     .from('interviews')
     .select('*')
+
+  query = applyInterviewDateFilters(query, range)
+
+  const { data: interviewsData, error: interviewsError } = await query
     .order('interview_date', { ascending: false })
     .order('updated_at', { ascending: false })
 
