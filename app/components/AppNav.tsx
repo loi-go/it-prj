@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import type { User } from '@supabase/supabase-js'
 import { signout } from '@/app/auth/actions'
+import { createClient } from '@/lib/supabase/server'
+import { isProfileCaller } from '@/lib/profileRoles'
 
 type Section = 'standups' | 'interviews' | 'analytics' | 'admin'
 
 type AppNavProps = {
-  user: User
-  isAdmin: boolean
   section: Section
   standupsSub?: 'mine' | 'all'
   interviewsSub?: 'mine' | 'all'
@@ -18,18 +17,32 @@ function navLinkClass(active: boolean) {
     : 'text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors'
 }
 
-export default function AppNav({
-  user,
-  isAdmin,
+export default async function AppNav({
   section,
   standupsSub,
   interviewsSub,
 }: AppNavProps) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin, is_caller')
+    .eq('id', user.id)
+    .single()
+
+  const isAdmin = profile?.is_admin === true
+  const isCaller = profile ? isProfileCaller(profile) : false
+
   const displayName =
     (user.user_metadata?.name as string | undefined) || user.email || 'User'
 
-  const showStandupsTabs = section === 'standups' && standupsSub
-  const showInterviewsTabs = section === 'interviews' && interviewsSub
+  const showStandupsTabs = !isCaller && section === 'standups' && standupsSub
+  const showInterviewsTabs = !isCaller && section === 'interviews' && interviewsSub
 
   return (
     <nav className="bg-white shadow-sm">
@@ -38,9 +51,11 @@ export default function AppNav({
           <div className="flex items-center space-x-8">
             <h1 className="text-xl font-bold text-gray-900">3R</h1>
             <div className="flex space-x-6">
-              <Link href="/standups" className={navLinkClass(section === 'standups')}>
-                Daily Standups
-              </Link>
+              {!isCaller && (
+                <Link href="/standups" className={navLinkClass(section === 'standups')}>
+                  Daily Standups
+                </Link>
+              )}
               <Link href="/interviews" className={navLinkClass(section === 'interviews')}>
                 Interviews
               </Link>

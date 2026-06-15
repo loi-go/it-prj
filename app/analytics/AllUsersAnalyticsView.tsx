@@ -27,6 +27,7 @@ type Profile = {
 type Props = {
   interviews: Interview[]
   profiles: Profile[]
+  viewerOnlySelf?: boolean
 }
 
 type UserAnalytics = {
@@ -39,7 +40,11 @@ type UserAnalytics = {
   firstInterviewPassRate: number
 }
 
-export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
+export default function AllUsersAnalyticsView({
+  interviews,
+  profiles,
+  viewerOnlySelf = false,
+}: Props) {
   const [userAnalytics, setUserAnalytics] = useState<UserAnalytics[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [weeklyData, setWeeklyData] = useState<any[]>([])
@@ -253,10 +258,15 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
         
         setUserAnalytics(sortedAnalytics)
         
-        // Auto-select all users initially for both charts
         const allUserIds = new Set(sortedAnalytics.map(u => u.userId))
-        setWeeklySelectedUsers(allUserIds)
-        setMonthlySelectedUsers(allUserIds)
+        if (viewerOnlySelf && sortedAnalytics.length > 0) {
+          const selfId = sortedAnalytics[0].userId
+          setWeeklySelectedUsers(new Set([selfId]))
+          setMonthlySelectedUsers(new Set([selfId]))
+        } else {
+          setWeeklySelectedUsers(allUserIds)
+          setMonthlySelectedUsers(allUserIds)
+        }
         
         // Calculate chart data after setting users
         setTimeout(() => {
@@ -271,7 +281,7 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
     }
 
     calculateAnalytics()
-  }, [interviews, profiles])
+  }, [interviews, profiles, viewerOnlySelf])
 
   // Recalculate chart data when date ranges change
   useEffect(() => {
@@ -472,8 +482,14 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Analytics</h1>
-        <p className="text-gray-600">Interview performance overview for all team members</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {viewerOnlySelf ? 'My Analytics' : 'Team Analytics'}
+        </h1>
+        <p className="text-gray-600">
+          {viewerOnlySelf
+            ? 'Your interview performance overview'
+            : 'Interview performance overview for all team members'}
+        </p>
         {interviews.length > 0 && (
           <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2 pt-4 border-t border-gray-100">
             <p className="text-sm text-gray-500">
@@ -650,8 +666,8 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
 
             {/* Controls Section */}
             <div className="p-8 bg-gradient-to-r from-gray-50 to-blue-50/50">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* User Selection */}
+              <div className={`grid grid-cols-1 ${viewerOnlySelf ? '' : 'lg:grid-cols-2'} gap-8`}>
+                {!viewerOnlySelf && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -686,8 +702,8 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
                     ))}
                   </div>
                 </div>
+                )}
 
-                {/* Metric Selection */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
@@ -826,8 +842,8 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
 
             {/* Controls Section */}
             <div className="p-8 bg-gradient-to-r from-gray-50 to-purple-50/50">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* User Selection */}
+              <div className={`grid grid-cols-1 ${viewerOnlySelf ? '' : 'lg:grid-cols-2'} gap-8`}>
+                {!viewerOnlySelf && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -862,8 +878,8 @@ export default function AllUsersAnalyticsView({ interviews, profiles }: Props) {
                     ))}
                   </div>
                 </div>
+                )}
 
-                {/* Metric Selection */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">

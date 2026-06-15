@@ -18,7 +18,7 @@ export default async function InterviewsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('verified, is_admin')
+    .select('verified')
     .eq('id', user.id)
     .single()
 
@@ -31,12 +31,7 @@ export default async function InterviewsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AppNav
-        user={user}
-        isAdmin={profile.is_admin === true}
-        section="interviews"
-        interviewsSub="mine"
-      />
+      <AppNav section="interviews" interviewsSub="mine" />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">

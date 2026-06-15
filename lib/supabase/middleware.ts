@@ -1,5 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import {
+  getHomePathForProfile,
+  isCallerBlockedPath,
+  isProfileCaller,
+} from '@/lib/profileRoles'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -35,21 +40,41 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const pathname = request.nextUrl.pathname
+
+  let profile: { is_admin?: boolean; is_caller?: boolean } | null = null
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('is_admin, is_caller')
+      .eq('id', user.id)
+      .single()
+    profile = data
+  }
+
+  const caller = profile ? isProfileCaller(profile) : false
+
   // Protected routes - redirect to signin if not authenticated
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    request.nextUrl.pathname !== '/'
+    !pathname.startsWith('/auth') &&
+    pathname !== '/'
   ) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/signin'
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && request.nextUrl.pathname.startsWith('/auth')) {
+  if (user && caller && (pathname === '/' || isCallerBlockedPath(pathname))) {
     const url = request.nextUrl.clone()
-    url.pathname = '/standups'
+    url.pathname = '/interviews'
+    return NextResponse.redirect(url)
+  }
+
+  // Redirect authenticated users away from auth pages
+  if (user && pathname.startsWith('/auth')) {
+    const url = request.nextUrl.clone()
+    url.pathname = profile ? getHomePathForProfile(profile) : '/standups'
     return NextResponse.redirect(url)
   }
 

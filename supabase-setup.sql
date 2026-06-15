@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   name TEXT NOT NULL,
   verified BOOLEAN DEFAULT false NOT NULL,
   is_admin BOOLEAN DEFAULT false NOT NULL,
+  is_caller BOOLEAN DEFAULT false NOT NULL,
   disabled BOOLEAN DEFAULT false NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL

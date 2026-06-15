@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getHomePathForProfile } from '@/lib/profileRoles'
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
@@ -63,7 +64,7 @@ export async function signin(formData: FormData) {
   // Check if user is verified
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('verified, disabled')
+    .select('verified, disabled, is_admin, is_caller')
     .eq('id', authData.user.id)
     .single()
 
@@ -85,7 +86,7 @@ export async function signin(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/standups')
+  redirect(getHomePathForProfile(profile))
 }
 
 export async function signout() {

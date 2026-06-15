@@ -12,6 +12,7 @@ export type AdminUserRow = {
   verified: boolean
   disabled: boolean
   is_admin: boolean
+  is_caller: boolean
 }
 
 async function requireAdmin(): Promise<
@@ -72,7 +73,7 @@ export async function listUsersForAdmin(): Promise<
   const supabase = await createClient()
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
-    .select('id, name, verified, disabled, is_admin')
+    .select('id, name, verified, disabled, is_admin, is_caller')
 
   if (profilesError) return { error: profilesError.message }
 
@@ -88,6 +89,7 @@ export async function listUsersForAdmin(): Promise<
       verified: p?.verified ?? false,
       disabled: p?.disabled ?? false,
       is_admin: p?.is_admin ?? false,
+      is_caller: p?.is_caller ?? false,
     }
   })
 
@@ -98,21 +100,29 @@ export async function listUsersForAdmin(): Promise<
 
 export async function adminUpdateProfile(
   userId: string,
-  patch: { verified?: boolean; disabled?: boolean; is_admin?: boolean }
+  patch: { verified?: boolean; disabled?: boolean; is_admin?: boolean; is_caller?: boolean }
 ): Promise<{ success: true } | { error: string }> {
   const gate = await requireAdmin()
   if (!gate.ok) return { error: gate.error }
   if (userId === gate.userId) {
     if (patch.disabled === true) return { error: 'You cannot disable your own account.' }
     if (patch.is_admin === false) return { error: 'You cannot remove your own admin role here.' }
+    if (patch.is_caller === false) return { error: 'You cannot remove your own caller role here.' }
   }
 
+  const finalPatch = { ...patch }
+  if (patch.is_caller === true) finalPatch.is_admin = false
+  if (patch.is_admin === true) finalPatch.is_caller = false
+
   const supabase = await createClient()
-  const { error } = await supabase.from('profiles').update(patch).eq('id', userId)
+  const { error } = await supabase.from('profiles').update(finalPatch).eq('id', userId)
 
   if (error) return { error: error.message }
 
   revalidatePath('/admin')
+  revalidatePath('/interviews')
+  revalidatePath('/analytics')
+  revalidatePath('/standups')
   revalidatePath('/', 'layout')
   return { success: true }
 }

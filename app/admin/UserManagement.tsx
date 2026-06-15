@@ -59,6 +59,7 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                   )}
                   {u.disabled && <span className="ml-2 text-red-700">Disabled</span>}
                   {u.is_admin && <span className="ml-2 text-indigo-700">Admin</span>}
+                  {u.is_caller && !u.is_admin && <span className="ml-2 text-sky-700">Caller</span>}
                 </td>
                 <td className="px-4 py-3 text-right text-sm">
                   <div className="flex flex-wrap justify-end gap-2">
@@ -118,7 +119,13 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                           else {
                             setUsers(prev =>
                               prev.map(x =>
-                                x.id === u.id ? { ...x, is_admin: !u.is_admin } : x
+                                x.id === u.id
+                                  ? {
+                                      ...x,
+                                      is_admin: !u.is_admin,
+                                      is_caller: !u.is_admin ? false : x.is_caller,
+                                    }
+                                  : x
                               )
                             )
                             setMessage('Saved.')
@@ -127,6 +134,34 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                       }}
                     >
                       {u.is_admin ? 'Remove admin' : 'Make admin'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending || u.id === currentUserId || u.is_admin}
+                      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                      onClick={() => {
+                        clearAlerts()
+                        startTransition(async () => {
+                          const r = await adminUpdateProfile(u.id, { is_caller: !u.is_caller })
+                          if ('error' in r) setError(r.error)
+                          else {
+                            setUsers(prev =>
+                              prev.map(x =>
+                                x.id === u.id
+                                  ? {
+                                      ...x,
+                                      is_caller: !u.is_caller,
+                                      is_admin: !u.is_caller ? false : x.is_admin,
+                                    }
+                                  : x
+                              )
+                            )
+                            setMessage('Saved.')
+                          }
+                        })
+                      }}
+                    >
+                      {u.is_caller ? 'Remove caller' : 'Make caller'}
                     </button>
                     <button
                       type="button"

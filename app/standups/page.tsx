@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { signout } from '@/app/auth/actions'
 import StandupsView from './StandupsView'
 import AppNav from '@/app/components/AppNav'
+import { isProfileCaller } from '@/lib/profileRoles'
 
 export default async function StandupsPage() {
   const supabase = await createClient()
@@ -16,7 +16,7 @@ export default async function StandupsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('verified, is_admin')
+    .select('verified, is_admin, is_caller')
     .eq('id', user.id)
     .single()
 
@@ -24,14 +24,13 @@ export default async function StandupsPage() {
     redirect('/auth/signin?error=Please wait for admin verification')
   }
 
+  if (isProfileCaller(profile)) {
+    redirect('/interviews')
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <AppNav
-        user={user}
-        isAdmin={profile.is_admin === true}
-        section="standups"
-        standupsSub="mine"
-      />
+      <AppNav section="standups" standupsSub="mine" />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">

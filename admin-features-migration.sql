@@ -8,6 +8,9 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false NOT NULL;
 
 ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS is_caller BOOLEAN DEFAULT false NOT NULL;
+
+ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS disabled BOOLEAN DEFAULT false NOT NULL;
 
 -- Admins may update any profile (verified, disabled, is_admin, name, etc.)
