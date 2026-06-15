@@ -104,7 +104,7 @@ export async function getAllStandups(range?: StandupDateRange) {
     ? (standupsData ?? [])
     : (standupsData ?? []).filter(s => !adminUserIds.has(s.user_id) || s.user_id === user.id)
 
-  const standupUserIds = [...new Set(standupsFiltered.map(s => s.user_id))]
+  const standupUserIds = Array.from(new Set(standupsFiltered.map(s => s.user_id)))
 
   const { data: profilesData, error: profilesError } = standupUserIds.length > 0
     ? await supabase
