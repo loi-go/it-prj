@@ -1,5 +1,7 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { signout } from '@/app/auth/actions'
+import logo from '@/logo.png'
 import { createClient } from '@/lib/supabase/server'
 import { isProfileCaller } from '@/lib/profileRoles'
 
@@ -49,7 +51,7 @@ export default async function AppNav({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-8">
-            <h1 className="text-xl font-bold text-gray-900">3R</h1>
+            <Image src={logo} alt="RRR" className="h-10 w-auto" priority />
             <div className="flex space-x-6">
               {!isCaller && (
                 <Link href="/standups" className={navLinkClass(section === 'standups')}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Spinner from '@/app/components/Spinner'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 type Interview = {
@@ -464,7 +465,7 @@ export default function AllUsersAnalyticsView({
           <p className="text-gray-600">Loading interview performance data...</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <Spinner size="lg" className="mx-auto" />
           <p className="mt-4 text-gray-600">Calculating analytics...</p>
         </div>
       </div>

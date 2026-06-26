@@ -8,6 +8,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      animation: {
+        'rrr-dash': 'rrr-dash 0.75s ease-in-out infinite',
+      },
+      keyframes: {
+        'rrr-dash': {
+          '0%, 100%': { transform: 'translateX(0) scale(1)' },
+          '50%': { transform: 'translateX(10%) scale(1.03)' },
+        },
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

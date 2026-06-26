@@ -1,3 +1,5 @@
+import Spinner from '@/app/components/Spinner'
+
 export default function Loading() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,8 +30,7 @@ export default function Loading() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            {/* Spinner */}
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mb-4"></div>
+            <Spinner size="xl" className="mb-4" />
             <p className="text-gray-600 text-lg font-medium">Loading standups...</p>
             <p className="text-gray-400 text-sm mt-2">Please wait while we fetch your data</p>
           </div>

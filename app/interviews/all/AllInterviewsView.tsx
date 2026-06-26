@@ -6,7 +6,7 @@ import { getAllInterviews } from '../actions'
 import ReactMarkdown from 'react-markdown'
 import InterviewDateRangeFilter from '../InterviewDateRangeFilter'
 import InterviewFilterSummary from '../InterviewFilterSummary'
-import InterviewSpinner from '../InterviewSpinner'
+import Spinner from '@/app/components/Spinner'
 import {
   getDefaultInterviewDateRange,
   getInterviewDateRangeForPreset,
@@ -473,7 +473,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
           {loadingInterviews && (
             <div className="absolute inset-0 bg-white/75 flex items-center justify-center z-10 rounded-lg">
               <div className="text-center">
-                <InterviewSpinner size="lg" className="mx-auto" />
+                <Spinner size="lg" className="mx-auto" />
                 <p className="mt-3 text-sm font-medium text-gray-700">Loading interviews...</p>
               </div>
             </div>
@@ -765,7 +765,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                   )}
                   {aiLoading && (
                     <div className="flex items-center justify-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                      <Spinner size="sm" />
                     </div>
                   )}
                 </div>
@@ -786,7 +786,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                   >
                     {aiLoading ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <Spinner size="xs" />
                         Analyzing...
                       </>
                     ) : (
