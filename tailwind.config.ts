@@ -16,6 +16,9 @@ const config: Config = {
         'rrr-dash': 'rrr-dash 0.75s ease-in-out infinite',
         'fade-in': 'fade-in 0.4s ease-out',
         'slide-up': 'slide-up 0.4s ease-out',
+        'modal-backdrop-in': 'modal-backdrop-in 0.2s ease-out forwards',
+        'modal-panel-in': 'modal-panel-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'expand-item-in': 'expand-item-in 0.3s ease-out both',
       },
       keyframes: {
         'rrr-dash': {
@@ -28,6 +31,18 @@ const config: Config = {
         },
         'slide-up': {
           from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'modal-backdrop-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'modal-panel-in': {
+          from: { opacity: '0', transform: 'translateY(20px) scale(0.96)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        'expand-item-in': {
+          from: { opacity: '0', transform: 'translateY(-8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
       },

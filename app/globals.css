@@ -139,11 +139,18 @@
   }
 
   .modal-overlay {
-    @apply fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50;
+    @apply fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-modal-backdrop-in;
   }
 
   .modal-panel {
-    @apply glass-card w-full max-w-lg rounded-2xl shadow-modal;
+    @apply bg-white w-full max-w-lg rounded-2xl border border-border/60 shadow-modal animate-modal-panel-in;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal-overlay,
+    .modal-panel {
+      animation: none;
+    }
   }
 
   .nav-bar {

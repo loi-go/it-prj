@@ -13,6 +13,7 @@ import {
   matchInterviewDatePreset,
   type InterviewDatePreset,
 } from '../utils'
+import { copyToClipboard } from '@/lib/copyToClipboard'
 
 type Interview = {
   id: string
@@ -263,12 +264,12 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
   }
 
   const handleCopyScript = async (script: string, interviewId: string) => {
-    try {
-      await navigator.clipboard.writeText(script)
+    const copied = await copyToClipboard(script)
+    if (copied) {
       setCopiedScriptId(interviewId)
       setTimeout(() => setCopiedScriptId(null), 2000)
-    } catch (err) {
-      console.error('Failed to copy script:', err)
+    } else {
+      alert('Could not copy to clipboard. Please select the script and copy it manually.')
     }
   }
 
@@ -522,7 +523,7 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                           <div className="flex items-center gap-2 mb-2">
                             {/* Expand/Collapse Icon */}
                             <svg
-                              className={`w-5 h-5 text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                              className={`w-5 h-5 text-muted transition-transform duration-300 ease-in-out ${isExpanded ? 'rotate-90' : ''}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -560,8 +561,17 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                     </div>
 
                     {/* Expanded Child Cards - Individual Interviews */}
-                    {isExpanded && (
-                      <div className="border-t-4 border-accent/30 bg-gradient-to-b from-elevated-muted to-elevated-muted/80">
+                    <div
+                      className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                        isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                      }`}
+                    >
+                      <div className="overflow-hidden min-h-0">
+                        <div
+                          className={`border-t-4 border-accent/30 bg-gradient-to-b from-elevated-muted to-elevated-muted/80 transition-all duration-300 ease-out ${
+                            isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+                          }`}
+                        >
                         <div className="px-6 py-3 bg-accent-subtle border-b border-accent/20">
                           <p className="text-xs font-semibold text-accent-hover uppercase tracking-wide">Interview Details</p>
                         </div>
@@ -569,7 +579,10 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                         {sortedInterviews.map((interview, idx) => (
                           <div 
                             key={interview.id} 
-                            className="mx-4 my-3 bg-elevated rounded-lg shadow-sm border border-border p-4"
+                            className={`mx-4 my-3 bg-elevated rounded-lg shadow-sm border border-border p-4 ${
+                              isExpanded ? 'animate-expand-item-in' : ''
+                            }`}
+                            style={isExpanded ? { animationDelay: `${idx * 60}ms` } : undefined}
                           >
                             {/* Interview Header - Single Line */}
                             <div className="flex justify-between items-center mb-3">
@@ -629,8 +642,9 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                             )}
                           </div>
                         ))}
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 )
               })}
@@ -694,7 +708,11 @@ export default function AllInterviewsView({ initialInterviews }: Props) {
                 <div className="flex justify-between items-center px-6 py-3 border-b border-border bg-elevated-muted">
                   <h4 className="text-sm font-semibold text-secondary">Interview Script</h4>
                   <button
-                    onClick={() => handleCopyScript(currentScript, 'modal')}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void handleCopyScript(currentScript, 'modal')
+                    }}
                     className="text-xs px-3 py-1 bg-accent-subtle text-accent hover:bg-accent-muted rounded transition-colors flex items-center gap-1"
                   >
                     {copiedScriptId === 'modal' ? (
