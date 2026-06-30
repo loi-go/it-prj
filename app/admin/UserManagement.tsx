@@ -23,50 +23,52 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
   return (
     <div className="space-y-4">
       {(message || error) && (
-        <div className="rounded-md border border-gray-200 bg-white p-4 text-sm">
+        <div className="card-flat p-4 text-sm">
           {error && <p className="text-red-600">{error}</p>}
-          {message && !error && <p className="text-gray-700">{message}</p>}
+          {message && !error && <p className="text-secondary">{message}</p>}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="table-shell">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="table-head">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-muted">
                 User
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-muted">
                 Status
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-widest text-muted">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-border bg-elevated/60">
             {users.map(u => (
-              <tr key={u.id}>
+              <tr key={u.id} className="hover:bg-elevated-muted/50 transition-colors">
                 <td className="px-4 py-3 text-sm">
-                  <div className="font-medium text-gray-900">{u.name}</div>
-                  <div className="text-gray-500">{u.email ?? u.id}</div>
+                  <div className="font-medium text-foreground">{u.name}</div>
+                  <div className="text-muted">{u.email ?? u.id}</div>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
-                  {u.verified ? (
-                    <span className="text-green-700">Verified</span>
-                  ) : (
-                    <span className="text-amber-700">Unverified</span>
-                  )}
-                  {u.disabled && <span className="ml-2 text-red-700">Disabled</span>}
-                  {u.is_admin && <span className="ml-2 text-indigo-700">Admin</span>}
-                  {u.is_caller && !u.is_admin && <span className="ml-2 text-sky-700">Caller</span>}
+                <td className="px-4 py-3 text-sm">
+                  <div className="flex flex-wrap gap-1.5">
+                    {u.verified ? (
+                      <span className="badge-success">Verified</span>
+                    ) : (
+                      <span className="badge-warning">Unverified</span>
+                    )}
+                    {u.disabled && <span className="badge-danger">Disabled</span>}
+                    {u.is_admin && <span className="badge-accent">Admin</span>}
+                    {u.is_caller && !u.is_admin && <span className="badge bg-sky-100 text-sky-700">Caller</span>}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-right text-sm">
                   <div className="flex flex-wrap justify-end gap-2">
                     <button
                       type="button"
                       disabled={pending}
-                      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                      className="btn-secondary !px-2 !py-1 text-xs"
                       onClick={() => {
                         clearAlerts()
                         startTransition(async () => {
@@ -88,7 +90,7 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                     <button
                       type="button"
                       disabled={pending || u.id === currentUserId}
-                      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                      className="btn-secondary !px-2 !py-1 text-xs"
                       onClick={() => {
                         clearAlerts()
                         startTransition(async () => {
@@ -110,7 +112,7 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                     <button
                       type="button"
                       disabled={pending || u.id === currentUserId}
-                      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                      className="btn-secondary !px-2 !py-1 text-xs"
                       onClick={() => {
                         clearAlerts()
                         startTransition(async () => {
@@ -138,7 +140,7 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                     <button
                       type="button"
                       disabled={pending || u.id === currentUserId || u.is_admin}
-                      className="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                      className="btn-secondary !px-2 !py-1 text-xs"
                       onClick={() => {
                         clearAlerts()
                         startTransition(async () => {
@@ -166,7 +168,7 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                     <button
                       type="button"
                       disabled={pending || u.id === currentUserId}
-                      className="rounded border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs text-indigo-800 hover:bg-indigo-100 disabled:opacity-50"
+                      className="btn-secondary !px-2 !py-1 text-xs !border-accent/30 !bg-accent-subtle !text-accent-hover"
                       onClick={() => {
                         if (
                           !confirm(
@@ -187,7 +189,7 @@ export default function UserManagement({ initialUsers, currentUserId }: Props) {
                     <button
                       type="button"
                       disabled={pending || u.id === currentUserId}
-                      className="rounded border border-red-200 px-2 py-1 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50"
+                      className="btn-secondary !px-2 !py-1 text-xs !border-red-200 !text-red-700 hover:!bg-danger-muted"
                       onClick={() => {
                         if (!confirm(`Delete user ${u.email ?? u.id}? This cannot be undone.`))
                           return

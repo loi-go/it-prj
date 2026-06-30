@@ -30,7 +30,7 @@ export default async function InterviewsPage() {
   const result = await getInterviews(getDefaultInterviewDateRange())
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-shell">
       <AppNav section="interviews" interviewsSub="mine" />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

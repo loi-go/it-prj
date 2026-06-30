@@ -22,71 +22,53 @@ export default function DateRangeFilter({
   formatDateLabel,
 }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+    <div className="filter-panel">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Date Range
-          </label>
+          <label className="label mb-2">Date Range</label>
           <div className="flex flex-col sm:flex-row gap-2">
             <div>
-              <label htmlFor="standupDateFrom" className="block text-xs font-medium text-gray-500 mb-1">
-                From
-              </label>
+              <label htmlFor="standupDateFrom" className="label-sm">From</label>
               <input
                 id="standupDateFrom"
                 type="date"
                 value={dateFrom}
                 max={dateTo}
                 onChange={(e) => onDateFromChange(e.target.value)}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                className="input-field !py-2"
               />
             </div>
-            <span className="hidden sm:flex items-end pb-2 text-sm text-gray-400 px-1">to</span>
+            <span className="hidden sm:flex items-end pb-2 text-sm text-muted px-1">to</span>
             <div>
-              <label htmlFor="standupDateTo" className="block text-xs font-medium text-gray-500 mb-1">
-                To
-              </label>
+              <label htmlFor="standupDateTo" className="label-sm">To</label>
               <input
                 id="standupDateTo"
                 type="date"
                 value={dateTo}
                 min={dateFrom}
                 onChange={(e) => onDateToChange(e.target.value)}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                className="input-field !py-2"
               />
             </div>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onPreset(7)}
-            className="px-3 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
+          <button type="button" onClick={() => onPreset(7)} className="btn-chip">
             Last 7 days
           </button>
-          <button
-            type="button"
-            onClick={() => onPreset(30)}
-            className="px-3 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
+          <button type="button" onClick={() => onPreset(30)} className="btn-chip">
             Last 30 days
           </button>
           {isActive && (
-            <button
-              type="button"
-              onClick={onReset}
-              className="px-3 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
-            >
+            <button type="button" onClick={onReset} className="btn-ghost">
               Reset
             </button>
           )}
         </div>
       </div>
 
-      <p className="mt-3 text-sm text-gray-500">
+      <p className="mt-3 text-sm text-muted">
         {formatDateLabel(dateFrom)} – {formatDateLabel(dateTo)} · {resultCount} standup{resultCount === 1 ? '' : 's'} in selected range
       </p>
     </div>

@@ -460,13 +460,13 @@ export default function AllUsersAnalyticsView({
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Analytics</h1>
-          <p className="text-gray-600">Loading interview performance data...</p>
+        <div className="bg-elevated rounded-lg shadow-sm border border-border p-6">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Team Analytics</h1>
+          <p className="text-muted">Loading interview performance data...</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-elevated rounded-lg shadow-sm border border-border p-12 text-center">
           <Spinner size="lg" className="mx-auto" />
-          <p className="mt-4 text-gray-600">Calculating analytics...</p>
+          <p className="mt-4 text-muted">Calculating analytics...</p>
         </div>
       </div>
     )
@@ -482,24 +482,24 @@ export default function AllUsersAnalyticsView({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="bg-elevated rounded-lg shadow-sm border border-border p-6">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           {viewerOnlySelf ? 'My Analytics' : 'Team Analytics'}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-muted">
           {viewerOnlySelf
             ? 'Your interview performance overview'
             : 'Interview performance overview for all team members'}
         </p>
         {interviews.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2 pt-4 border-t border-gray-100">
-            <p className="text-sm text-gray-500">
+          <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2 pt-4 border-t border-border-subtle">
+            <p className="text-sm text-muted">
               All interviews / companies × 100
             </p>
-            <p className="text-2xl font-bold text-indigo-600 tabular-nums">
+            <p className="text-2xl font-bold text-accent tabular-nums">
               {teamInterviewsPerCompanyTimes100}
             </p>
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-muted/70">
               ({teamTotalInterviews} interviews · {teamUniqueCompanies} companies)
             </span>
           </div>
@@ -508,18 +508,18 @@ export default function AllUsersAnalyticsView({
 
       {/* User Cards */}
       {userAnalytics.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-          <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-elevated rounded-lg shadow-sm border border-border p-12 text-center">
+          <svg className="w-12 h-12 mx-auto mb-4 text-muted/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Interview Data</h3>
-          <p className="text-gray-600 mb-4">
+          <h3 className="text-lg font-medium text-foreground mb-2">No Interview Data</h3>
+          <p className="text-muted mb-4">
             {interviews.length === 0 
               ? "No interviews found in the database." 
               : `Found ${interviews.length} interviews but no user analytics could be calculated.`
             }
           </p>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted">
             <p>Raw data: {interviews.length} interviews, {profiles.length} profiles</p>
             {interviews.length > 0 && (
               <p className="mt-2">Sample interview user_ids: {interviews.slice(0, 3).map(i => i.user_id).join(', ')}</p>
@@ -529,7 +529,7 @@ export default function AllUsersAnalyticsView({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {userAnalytics.map((user, index) => (
-            <div key={user.userId} className="group bg-gradient-to-br from-white to-gray-50/50 rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl hover:scale-105 transition-all duration-300">
+            <div key={user.userId} className="group bg-gradient-to-br from-elevated to-elevated-muted/50 rounded-2xl shadow-lg border border-border-subtle p-8 hover:shadow-xl hover:scale-105 transition-all duration-300">
               {/* User Header */}
               <div className="flex items-center mb-6">
                 <div className="relative">
@@ -548,27 +548,27 @@ export default function AllUsersAnalyticsView({
                   </div>
                 </div>
                 <div className="ml-4 flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors">
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-secondary transition-colors">
                     {user.userName}
                   </h3>
-                  <p className="text-sm text-gray-500 font-medium">Team Member</p>
+                  <p className="text-sm text-muted font-medium">Team Member</p>
                 </div>
               </div>
 
               {/* Summary Text */}
               <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
-                <p className="text-gray-800 text-sm leading-relaxed font-medium">
+                <p className="text-secondary text-sm leading-relaxed font-medium">
                   <span className="inline-flex items-center gap-1 flex-wrap">
                     <span className="font-bold text-blue-600 text-lg">{user.totalInterviews}</span>
-                    <span className="text-gray-600">interviews with</span>
+                    <span className="text-muted">interviews with</span>
                     <span className="font-bold text-purple-600 text-lg">{user.totalCompanies}</span>
-                    <span className="text-gray-600">companies</span>
+                    <span className="text-muted">companies</span>
                   </span>
                   <span className="mt-3 block pt-3 border-t border-blue-100/80">
-                    <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">
+                    <span className="text-muted text-xs font-medium uppercase tracking-wide">
                       (interviews ÷ companies) × 100
                     </span>
-                    <span className="mt-1 block font-bold text-indigo-600 text-2xl tabular-nums">
+                    <span className="mt-1 block font-bold text-accent text-2xl tabular-nums">
                       {user.interviewsPerCompanyTimes100}
                     </span>
                   </span>
@@ -594,8 +594,8 @@ export default function AllUsersAnalyticsView({
               {/* Pass Rate Progress Bar */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-700">First Interview Success Rate</span>
-                  <span className="text-sm font-bold text-gray-900">{user.firstInterviewPassRate}%</span>
+                  <span className="text-sm font-semibold text-secondary">First Interview Success Rate</span>
+                  <span className="text-sm font-bold text-foreground">{user.firstInterviewPassRate}%</span>
                 </div>
                 <div className="relative">
                   <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
@@ -609,11 +609,11 @@ export default function AllUsersAnalyticsView({
                     ></div>
                   </div>
                   <div 
-                    className="absolute top-0 w-1 h-3 bg-white rounded-full shadow-md transition-all duration-500"
+                    className="absolute top-0 w-1 h-3 bg-elevated rounded-full shadow-md transition-all duration-500"
                     style={{ left: `${Math.min(user.firstInterviewPassRate, 100)}%`, transform: 'translateX(-50%)' }}
                   ></div>
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 font-medium">
+                <div className="flex justify-between text-xs text-muted font-medium">
                   <span>0%</span>
                   <span>50%</span>
                   <span>100%</span>
@@ -630,10 +630,10 @@ export default function AllUsersAnalyticsView({
           {/* Weekly Trend Chart */}
           <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-lg border border-blue-100/50 overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+            <div className="bg-gradient-to-r from-violet-600 to-violet-500 px-8 py-6">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-elevated/20 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -645,7 +645,7 @@ export default function AllUsersAnalyticsView({
                 </div>
                 
                 {/* Date Range Selection */}
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                <div className="flex items-center gap-3 bg-elevated/10 backdrop-blur-sm rounded-xl px-4 py-2">
                   <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -654,19 +654,19 @@ export default function AllUsersAnalyticsView({
                     onChange={(e) => setWeeklyDateRange({ weeks: parseInt(e.target.value) })}
                     className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
                   >
-                    <option value={4} className="text-gray-900">Last 4 weeks</option>
-                    <option value={8} className="text-gray-900">Last 8 weeks</option>
-                    <option value={12} className="text-gray-900">Last 12 weeks</option>
-                    <option value={16} className="text-gray-900">Last 16 weeks</option>
-                    <option value={24} className="text-gray-900">Last 24 weeks</option>
-                    <option value={52} className="text-gray-900">Last year</option>
+                    <option value={4} className="text-foreground">Last 4 weeks</option>
+                    <option value={8} className="text-foreground">Last 8 weeks</option>
+                    <option value={12} className="text-foreground">Last 12 weeks</option>
+                    <option value={16} className="text-foreground">Last 16 weeks</option>
+                    <option value={24} className="text-foreground">Last 24 weeks</option>
+                    <option value={52} className="text-foreground">Last year</option>
                   </select>
                 </div>
               </div>
             </div>
 
             {/* Controls Section */}
-            <div className="p-8 bg-gradient-to-r from-gray-50 to-blue-50/50">
+            <div className="p-8 bg-gradient-to-r from-elevated-muted to-accent-subtle/50">
               <div className={`grid grid-cols-1 ${viewerOnlySelf ? '' : 'lg:grid-cols-2'} gap-8`}>
                 {!viewerOnlySelf && (
                 <div className="space-y-4">
@@ -676,26 +676,26 @@ export default function AllUsersAnalyticsView({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                       </svg>
                     </div>
-                    <h4 className="font-semibold text-gray-800">Team Members</h4>
+                    <h4 className="font-semibold text-secondary">Team Members</h4>
                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
                       {weeklySelectedUsers.size} selected
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto">
                     {userAnalytics.map((user, index) => (
-                      <label key={user.userId} className="group flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
+                      <label key={user.userId} className="group flex items-center gap-3 p-3 bg-elevated rounded-xl border border-border hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
                         <input
                           type="checkbox"
                           checked={weeklySelectedUsers.has(user.userId)}
                           onChange={() => toggleWeeklyUser(user.userId)}
-                          className="w-4 h-4 text-blue-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-blue-500/20"
+                          className="w-4 h-4 text-blue-600 border-2 border-border rounded focus:ring-2 focus:ring-blue-500/20"
                         />
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div 
                             className="w-3 h-3 rounded-full flex-shrink-0"
                             style={{ backgroundColor: getUserColor(user.userId) }}
                           ></div>
-                          <span className="text-sm font-medium text-gray-700 truncate group-hover:text-gray-900">
+                          <span className="text-sm font-medium text-secondary truncate group-hover:text-foreground">
                             {user.userName}
                           </span>
                         </div>
@@ -712,7 +712,7 @@ export default function AllUsersAnalyticsView({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                     </div>
-                    <h4 className="font-semibold text-gray-800">Metrics</h4>
+                    <h4 className="font-semibold text-secondary">Metrics</h4>
                     {weeklySelectedUsers.size >= 2 ? (
                       <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
                         Single selection
@@ -725,20 +725,20 @@ export default function AllUsersAnalyticsView({
                   </div>
                   <div className="space-y-3">
                     {availableMetrics.map((metric, index) => (
-                      <label key={metric.key} className="group flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 hover:border-green-300 hover:shadow-md transition-all cursor-pointer">
+                      <label key={metric.key} className="group flex items-center gap-3 p-3 bg-elevated rounded-xl border border-border hover:border-green-300 hover:shadow-md transition-all cursor-pointer">
                         <input
                           type={weeklySelectedUsers.size >= 2 ? "radio" : "checkbox"}
                           name={weeklySelectedUsers.size >= 2 ? "weeklyMetric" : undefined}
                           checked={weeklySelectedMetrics.has(metric.key)}
                           onChange={() => toggleWeeklyMetric(metric.key)}
-                          className="w-4 h-4 text-green-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-green-500/20"
+                          className="w-4 h-4 text-green-600 border-2 border-border rounded focus:ring-2 focus:ring-green-500/20"
                         />
                         <div className="flex items-center gap-2 flex-1">
                           <div 
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: getMetricColor(metric.key) }}
                           ></div>
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                          <span className="text-sm font-medium text-secondary group-hover:text-foreground">
                             {metric.label}
                           </span>
                         </div>
@@ -750,10 +750,10 @@ export default function AllUsersAnalyticsView({
             </div>
 
             {/* Chart Section */}
-            <div className="p-8 bg-white">
+            <div className="p-8 bg-elevated">
               <div className="h-80 relative">
                 {/* Chart Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-indigo-50/30 rounded-2xl"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-accent-subtle/30 to-violet-50/30 rounded-2xl"></div>
                 
                 <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={weeklyData} margin={{ bottom: 8, left: 8, right: 8, top: 8 }}>
@@ -809,7 +809,7 @@ export default function AllUsersAnalyticsView({
             <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-6">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-elevated/20 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -821,7 +821,7 @@ export default function AllUsersAnalyticsView({
                 </div>
                 
                 {/* Date Range Selection */}
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                <div className="flex items-center gap-3 bg-elevated/10 backdrop-blur-sm rounded-xl px-4 py-2">
                   <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -830,19 +830,19 @@ export default function AllUsersAnalyticsView({
                     onChange={(e) => setMonthlyDateRange({ months: parseInt(e.target.value) })}
                     className="bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer"
                   >
-                    <option value={3} className="text-gray-900">Last 3 months</option>
-                    <option value={6} className="text-gray-900">Last 6 months</option>
-                    <option value={12} className="text-gray-900">Last year</option>
-                    <option value={18} className="text-gray-900">Last 18 months</option>
-                    <option value={24} className="text-gray-900">Last 2 years</option>
-                    <option value={36} className="text-gray-900">Last 3 years</option>
+                    <option value={3} className="text-foreground">Last 3 months</option>
+                    <option value={6} className="text-foreground">Last 6 months</option>
+                    <option value={12} className="text-foreground">Last year</option>
+                    <option value={18} className="text-foreground">Last 18 months</option>
+                    <option value={24} className="text-foreground">Last 2 years</option>
+                    <option value={36} className="text-foreground">Last 3 years</option>
                   </select>
                 </div>
               </div>
             </div>
 
             {/* Controls Section */}
-            <div className="p-8 bg-gradient-to-r from-gray-50 to-purple-50/50">
+            <div className="p-8 bg-gradient-to-r from-elevated-muted to-violet-50/50">
               <div className={`grid grid-cols-1 ${viewerOnlySelf ? '' : 'lg:grid-cols-2'} gap-8`}>
                 {!viewerOnlySelf && (
                 <div className="space-y-4">
@@ -852,26 +852,26 @@ export default function AllUsersAnalyticsView({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                       </svg>
                     </div>
-                    <h4 className="font-semibold text-gray-800">Team Members</h4>
+                    <h4 className="font-semibold text-secondary">Team Members</h4>
                     <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
                       {monthlySelectedUsers.size} selected
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto">
                     {userAnalytics.map((user, index) => (
-                      <label key={user.userId} className="group flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all cursor-pointer">
+                      <label key={user.userId} className="group flex items-center gap-3 p-3 bg-elevated rounded-xl border border-border hover:border-purple-300 hover:shadow-md transition-all cursor-pointer">
                         <input
                           type="checkbox"
                           checked={monthlySelectedUsers.has(user.userId)}
                           onChange={() => toggleMonthlyUser(user.userId)}
-                          className="w-4 h-4 text-purple-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-purple-500/20"
+                          className="w-4 h-4 text-purple-600 border-2 border-border rounded focus:ring-2 focus:ring-purple-500/20"
                         />
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div 
                             className="w-3 h-3 rounded-full flex-shrink-0"
                             style={{ backgroundColor: getUserColor(user.userId) }}
                           ></div>
-                          <span className="text-sm font-medium text-gray-700 truncate group-hover:text-gray-900">
+                          <span className="text-sm font-medium text-secondary truncate group-hover:text-foreground">
                             {user.userName}
                           </span>
                         </div>
@@ -888,7 +888,7 @@ export default function AllUsersAnalyticsView({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <h4 className="font-semibold text-gray-800">Metrics</h4>
+                    <h4 className="font-semibold text-secondary">Metrics</h4>
                     {monthlySelectedUsers.size >= 2 ? (
                       <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
                         Single selection
@@ -901,20 +901,20 @@ export default function AllUsersAnalyticsView({
                   </div>
                   <div className="space-y-3">
                     {availableMetrics.map((metric, index) => (
-                      <label key={metric.key} className="group flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 hover:border-pink-300 hover:shadow-md transition-all cursor-pointer">
+                      <label key={metric.key} className="group flex items-center gap-3 p-3 bg-elevated rounded-xl border border-border hover:border-pink-300 hover:shadow-md transition-all cursor-pointer">
                         <input
                           type={monthlySelectedUsers.size >= 2 ? "radio" : "checkbox"}
                           name={monthlySelectedUsers.size >= 2 ? "monthlyMetric" : undefined}
                           checked={monthlySelectedMetrics.has(metric.key)}
                           onChange={() => toggleMonthlyMetric(metric.key)}
-                          className="w-4 h-4 text-pink-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-pink-500/20"
+                          className="w-4 h-4 text-pink-600 border-2 border-border rounded focus:ring-2 focus:ring-pink-500/20"
                         />
                         <div className="flex items-center gap-2 flex-1">
                           <div 
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: getMetricColor(metric.key) }}
                           ></div>
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                          <span className="text-sm font-medium text-secondary group-hover:text-foreground">
                             {metric.label}
                           </span>
                         </div>
@@ -926,7 +926,7 @@ export default function AllUsersAnalyticsView({
             </div>
 
             {/* Chart Section */}
-            <div className="p-8 bg-white">
+            <div className="p-8 bg-elevated">
               <div className="h-80 relative">
                 {/* Chart Background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-50/30 to-pink-50/30 rounded-2xl"></div>

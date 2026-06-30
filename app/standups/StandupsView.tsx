@@ -20,20 +20,20 @@ type Props = {
 type FormType = 'plan' | 'followup'
 
 const mdComponents: React.ComponentProps<typeof ReactMarkdown>['components'] = {
-  h1: ({ children }) => <h1 className="text-lg font-bold text-gray-900 mt-3 mb-1">{children}</h1>,
-  h2: ({ children }) => <h2 className="text-base font-bold text-gray-900 mt-2.5 mb-1">{children}</h2>,
-  h3: ({ children }) => <h3 className="text-sm font-semibold text-gray-900 mt-2 mb-0.5">{children}</h3>,
-  h4: ({ children }) => <h4 className="text-sm font-semibold text-gray-700 mt-2 mb-0.5">{children}</h4>,
-  h5: ({ children }) => <h5 className="text-xs font-semibold text-gray-700 mt-1.5 mb-0.5 uppercase tracking-wide">{children}</h5>,
-  h6: ({ children }) => <h6 className="text-xs font-medium text-gray-500 mt-1.5 mb-0.5 uppercase tracking-wide">{children}</h6>,
-  p:  ({ children }) => <p className="text-sm text-gray-700 mb-1.5 leading-relaxed">{children}</p>,
-  ul: ({ children }) => <ul className="list-disc list-inside text-sm text-gray-700 mb-1.5 space-y-0.5">{children}</ul>,
-  ol: ({ children }) => <ol className="list-decimal list-inside text-sm text-gray-700 mb-1.5 space-y-0.5">{children}</ol>,
-  li: ({ children }) => <li className="text-sm text-gray-700">{children}</li>,
-  strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-  em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
-  code: ({ children }) => <code className="bg-gray-100 text-indigo-600 rounded px-1 py-0.5 text-xs font-mono">{children}</code>,
-  blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-200 pl-3 text-gray-500 italic my-1.5">{children}</blockquote>,
+  h1: ({ children }) => <h1 className="text-lg font-bold text-foreground mt-3 mb-1">{children}</h1>,
+  h2: ({ children }) => <h2 className="text-base font-bold text-foreground mt-2.5 mb-1">{children}</h2>,
+  h3: ({ children }) => <h3 className="text-sm font-semibold text-foreground mt-2 mb-0.5">{children}</h3>,
+  h4: ({ children }) => <h4 className="text-sm font-semibold text-secondary mt-2 mb-0.5">{children}</h4>,
+  h5: ({ children }) => <h5 className="text-xs font-semibold text-secondary mt-1.5 mb-0.5 uppercase tracking-wide">{children}</h5>,
+  h6: ({ children }) => <h6 className="text-xs font-medium text-muted mt-1.5 mb-0.5 uppercase tracking-wide">{children}</h6>,
+  p:  ({ children }) => <p className="text-sm text-secondary mb-1.5 leading-relaxed">{children}</p>,
+  ul: ({ children }) => <ul className="list-disc list-inside text-sm text-secondary mb-1.5 space-y-0.5">{children}</ul>,
+  ol: ({ children }) => <ol className="list-decimal list-inside text-sm text-secondary mb-1.5 space-y-0.5">{children}</ol>,
+  li: ({ children }) => <li className="text-sm text-secondary">{children}</li>,
+  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  em: ({ children }) => <em className="italic text-secondary">{children}</em>,
+  code: ({ children }) => <code className="bg-elevated-muted text-accent rounded px-1 py-0.5 text-xs font-mono">{children}</code>,
+  blockquote: ({ children }) => <blockquote className="border-l-4 border-border pl-3 text-muted italic my-1.5">{children}</blockquote>,
 }
 
 const Md = ({ text }: { text: string }) => (
@@ -192,19 +192,19 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
     const isMine = viewMode === 'mine'
 
     return (
-      <div key={standup.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:border-indigo-300 transition-all">
+      <div key={standup.id} className="card shadow-card hover:border-accent/30 transition-all">
         <div className="p-5">
           {/* Card Header */}
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-base font-bold text-gray-900">
+              <p className="text-base font-bold text-foreground">
                 {isToday ? 'Today' : formatDate(standup.standup_date)}
               </p>
               {isToday && (
-                <p className="text-xs text-gray-400 mt-0.5 text-gray-900 bg-white">{formatDate(standup.standup_date)}</p>
+                <p className="text-xs text-muted/70 mt-0.5 text-foreground bg-elevated">{formatDate(standup.standup_date)}</p>
               )}
               {viewMode === 'all' && standup.profiles && (
-                <p className="text-sm text-gray-500 mt-0.5">by {standup.profiles.name}</p>
+                <p className="text-sm text-muted mt-0.5">by {standup.profiles.name}</p>
               )}
             </div>
             {isMine && !hasFollowup && (
@@ -212,7 +212,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                 <button
                   onClick={() => openPlanModal(standup)}
                   disabled={deletingId === standup.id}
-                  className="text-indigo-500 hover:text-indigo-700 text-sm disabled:opacity-50"
+                  className="text-accent hover:text-accent-hover text-sm disabled:opacity-50"
                 >
                   Edit
                 </button>
@@ -236,21 +236,21 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
           <div className="mb-4">
             <div className="flex items-center gap-1.5 mb-2">
               <span className="text-sm">📋</span>
-              <h4 className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">Daily Plan</h4>
+              <h4 className="text-xs font-semibold text-accent uppercase tracking-wider">Daily Plan</h4>
             </div>
             <Md text={standup.plan} />
           </div>
 
           {/* Follow-up */}
           {hasFollowup ? (
-            <div className="border-t border-gray-100 pt-4">
+            <div className="border-t border-border-subtle pt-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <span className="text-sm">✅</span>
                 <h4 className="text-xs font-semibold text-green-600 uppercase tracking-wider">Follow-up</h4>
                 {isMine && isToday && (
                   <button
                     onClick={() => openFollowupModal(standup)}
-                    className="ml-auto text-xs text-gray-400 hover:text-gray-600"
+                    className="ml-auto text-xs text-muted/70 hover:text-muted"
                   >
                     Edit
                   </button>
@@ -259,7 +259,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
               <Md text={standup.followup!} />
             </div>
           ) : isMine ? (
-            <div className="border-t border-gray-100 pt-4">
+            <div className="border-t border-border-subtle pt-4">
               <button
                 onClick={() => openFollowupModal(standup)}
                 className="w-full inline-flex justify-center items-center gap-2 px-4 py-2 border border-green-200 text-sm font-medium rounded-lg text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
@@ -277,7 +277,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="heading-page">
           {viewMode === 'mine' ? 'My Daily Standups' : 'All Daily Standups'}
         </h2>
       </div>
@@ -295,24 +295,24 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
       />
 
       {loading && standups.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
+        <div className="bg-elevated rounded-lg shadow p-8 text-center">
           <div className="flex justify-center"><Spinner size="md" /></div>
-          <p className="text-gray-500 mt-4">Loading standups...</p>
+          <p className="text-muted mt-4">Loading standups...</p>
         </div>
       ) : (
         <>
           {/* Today — Mine only */}
           {viewMode === 'mine' && (
             <div className="mb-8">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Today</h3>
+              <h3 className="heading-section mb-3">Today</h3>
               {todayStandup ? (
                 renderStandupCard(todayStandup, true)
               ) : (
-                <div className="bg-white rounded-xl shadow-sm border-2 border-dashed border-indigo-200 p-8 text-center">
-                  <p className="text-gray-400 text-sm mb-4">You haven't submitted your daily plan yet.</p>
+                <div className="card-flat border-2 border-dashed border-accent/30 p-8 text-center">
+                  <p className="text-muted text-sm mb-4">You haven&apos;t submitted your daily plan yet.</p>
                   <button
                     onClick={() => openPlanModal()}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
+                    className="btn-primary"
                   >
                     <span>📋</span>
                     Submit Daily Plan
@@ -325,12 +325,12 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
           {/* Past / All */}
           {(viewMode === 'mine' ? pastStandups : standups).length === 0 ? (
             viewMode === 'mine' ? (
-              <p className="text-center text-gray-400 text-sm py-4">
+              <p className="text-center text-muted/70 text-sm py-4">
                 {isDateRangeActive ? 'No standups in this date range.' : 'No past standups yet.'}
               </p>
             ) : (
-              <div className="bg-white rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">
+              <div className="bg-elevated rounded-lg shadow p-8 text-center">
+                <p className="text-muted">
                   {isDateRangeActive ? 'No standups in this date range.' : 'No standups yet.'}
                 </p>
               </div>
@@ -338,7 +338,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
           ) : viewMode === 'mine' ? (
             <>
               {pastStandups.length > 0 && (
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Past</h3>
+                <h3 className="heading-section mb-3">Past</h3>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pastStandups.map(s => renderStandupCard(s, false))}
@@ -348,7 +348,7 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
             <div className="space-y-6">
               {groupedAllStandupsByDate.map(group => (
                 <section key={group.date}>
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                  <h3 className="heading-section mb-3">
                     {group.date === today ? 'Today' : formatDate(group.date)}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -363,18 +363,18 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+        <div className="modal-overlay">
+          <div className="modal-panel">
+            <div className="px-6 py-4 border-b border-border-subtle flex items-center gap-3">
               <span className="text-xl">{formType === 'plan' ? '📋' : '✅'}</span>
               <div>
-                <h3 className="text-base font-semibold text-gray-900">
+                <h3 className="text-base font-semibold text-foreground">
                   {formType === 'plan'
                     ? editingStandup ? 'Edit Daily Plan' : 'Submit Daily Plan'
                     : editingStandup?.followup ? 'Edit Follow-up' : 'Submit Follow-up'
                   }
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5 text-gray-900 bg-white">
+                <p className="text-xs text-muted/70 mt-0.5 text-foreground bg-elevated">
                   {editingStandup ? formatDate(editingStandup.standup_date) : formatDate(standupDate)}
                 </p>
               </div>
@@ -389,18 +389,18 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
 
               {formType === 'plan' && !editingStandup && (
                 <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Date</label>
+                  <label className="block text-xs font-medium text-muted mb-1.5">Date</label>
                   <input
                     type="date"
                     value={standupDate}
                     onChange={(e) => setStandupDate(e.target.value)}
-                    className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20"
                   />
                 </div>
               )}
 
               <div className="mb-5">
-                <label className="block text-xs font-medium text-gray-500 mb-1.5 text-gray-900 bg-white">
+                <label className="block text-xs font-medium text-muted mb-1.5 text-foreground bg-elevated">
                   {formType === 'plan' ? 'What do you plan to do today?' : 'How did it go?'}
                 </label>
                 <textarea
@@ -409,23 +409,23 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
                   placeholder={formType === 'plan' ? 'Write your plan for the day...' : 'Write your end-of-day follow-up...'}
                   rows={6}
                   autoFocus
-                  className="block w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm bg-gray-50 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none leading-relaxed text-gray-900 bg-white"
+                  className="block w-full rounded-lg border border-border px-3 py-2.5 text-sm bg-elevated-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/20 resize-none leading-relaxed text-foreground bg-elevated"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
+              <div className="flex justify-end gap-3 border-t border-border-subtle pt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   disabled={submitting}
-                  className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-muted hover:bg-elevated-muted disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center px-4 py-2 rounded-lg bg-accent text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50 transition-colors"
                 >
                   {submitting ? (
                     <><Spinner size="xs" className="-ml-1 mr-2" />Saving...</>
@@ -442,10 +442,10 @@ export default function StandupsView({ currentUserId, initialViewMode = 'mine' }
 
       {/* Loading Overlay */}
       {loading && standups.length > 0 && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-xl text-center">
+        <div className="modal-overlay">
+          <div className="card-flat p-6 text-center">
             <div className="flex justify-center"><Spinner size="md" /></div>
-            <p className="mt-4 text-sm text-gray-700 font-medium">Loading...</p>
+            <p className="mt-4 text-sm text-secondary font-medium">Loading...</p>
           </div>
         </div>
       )}

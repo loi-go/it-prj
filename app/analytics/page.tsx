@@ -55,7 +55,7 @@ export default async function AnalyticsPage() {
   if (profilesError) console.log('Profiles error:', profilesError)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-shell">
       <AppNav section="analytics" />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

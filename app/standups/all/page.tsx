@@ -29,7 +29,7 @@ export default async function AllStandupsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-shell">
       <AppNav section="standups" standupsSub="all" />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

@@ -468,7 +468,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
       case 'Rejected':
         return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-500'
+        return 'bg-elevated-muted text-muted'
     }
   }
 
@@ -483,10 +483,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">My Interviews</h2>
+        <h2 className="text-2xl font-bold text-foreground">My Interviews</h2>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/20"
         >
           + Add Interview
         </button>
@@ -496,14 +496,14 @@ export default function InterviewsTable({ initialInterviews }: Props) {
       <div className="flex gap-6">
         {/* Sidebar - Filters */}
         <div className="w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg shadow sticky top-6 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
-            <div className="flex-shrink-0 p-4 border-b border-gray-100 space-y-4">
+          <div className="bg-elevated rounded-lg shadow sticky top-6 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
+            <div className="flex-shrink-0 p-4 border-b border-border-subtle space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                <h3 className="text-lg font-semibold text-foreground">Filters</h3>
                 {isFilterActive && (
                   <button
                     onClick={resetFilters}
-                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-xs text-accent hover:text-accent-hover font-medium"
                   >
                     Clear
                   </button>
@@ -531,22 +531,22 @@ export default function InterviewsTable({ initialInterviews }: Props) {
             <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-6">
               {/* Profile Checkboxes */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-secondary mb-2">
                   Profile
                 </label>
-                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded p-2">
+                <div className="space-y-2 max-h-40 overflow-y-auto border border-border rounded p-2">
                   {uniqueProfiles.length === 0 ? (
-                    <span className="text-sm text-gray-400">No profiles yet</span>
+                    <span className="text-sm text-muted/70">No profiles yet</span>
                   ) : (
                     uniqueProfiles.map(profile => (
-                      <label key={profile} className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded">
+                      <label key={profile} className="flex items-center cursor-pointer hover:bg-elevated-muted p-1 rounded">
                         <input
                           type="checkbox"
                           checked={selectedProfiles.has(profile)}
                           onChange={() => toggleProfile(profile)}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-accent focus:ring-accent/20 border-border rounded"
                         />
-                        <span className="ml-2 text-sm text-gray-700">{profile}</span>
+                        <span className="ml-2 text-sm text-secondary">{profile}</span>
                       </label>
                     ))
                   )}
@@ -555,7 +555,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
               {/* Company Search */}
               <div>
-                <label htmlFor="filterCompany" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="filterCompany" className="block text-sm font-semibold text-secondary mb-2">
                   Company
                 </label>
                   <input
@@ -564,20 +564,20 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     placeholder="Search..."
                     value={filterCompany}
                     onChange={(e) => setFilterCompany(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                    className="w-full rounded-md border border-border px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-accent/20 text-foreground bg-elevated"
                   />
               </div>
 
               {/* Status Dropdown */}
               <div>
-                <label htmlFor="filterStatus" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="filterStatus" className="block text-sm font-semibold text-secondary mb-2">
                   Status
                 </label>
                   <select
                     id="filterStatus"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                    className="w-full rounded-md border border-border px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-accent/20 text-foreground bg-elevated"
                   >
                   <option value="">All</option>
                   <option value="Ongoing">Ongoing</option>
@@ -593,27 +593,27 @@ export default function InterviewsTable({ initialInterviews }: Props) {
         {/* Main Content Area */}
         <div className="flex-1 min-w-0 relative">
           {loadingInterviews && (
-            <div className="absolute inset-0 bg-white/75 flex items-center justify-center z-10 rounded-lg">
+            <div className="absolute inset-0 bg-elevated/75 flex items-center justify-center z-10 rounded-lg">
               <div className="text-center">
                 <Spinner size="lg" className="mx-auto" />
-                <p className="mt-3 text-sm font-medium text-gray-700">Loading interviews...</p>
+                <p className="mt-3 text-sm font-medium text-secondary">Loading interviews...</p>
               </div>
             </div>
           )}
 
       {interviews.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">No interviews yet</p>
+        <div className="bg-elevated rounded-lg shadow p-8 text-center">
+          <p className="text-muted mb-4">No interviews yet</p>
           <button
             onClick={openCreateModal}
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
+            className="text-accent hover:text-accent-hover font-medium"
           >
             Add your first interview
           </button>
         </div>
       ) : filteredInterviews.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">No interviews match your filters</p>
+        <div className="bg-elevated rounded-lg shadow p-8 text-center">
+          <p className="text-muted mb-4">No interviews match your filters</p>
           <button
             onClick={() => {
               setSelectedProfiles(new Set())
@@ -622,51 +622,51 @@ export default function InterviewsTable({ initialInterviews }: Props) {
               setFilterDateFrom('')
               setFilterDateTo('')
             }}
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
+            className="text-accent hover:text-accent-hover font-medium"
           >
             Clear filters
           </button>
         </div>
       ) : isTableView ? (
         // Table View for Date Filter
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-elevated shadow-md rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-elevated-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Profile
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Company
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Step
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-elevated divide-y divide-gray-200">
                 {filteredInterviews.map((interview) => (
-                  <tr key={interview.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={interview.id} className="hover:bg-elevated-muted">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                       {interview.profile}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
                       {interview.company}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
                       {interview.step}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
                       {formatDate(interview.interview_date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -680,7 +680,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => openEditModal(interview)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        className="text-accent hover:text-accent-hover mr-4"
                       >
                         Edit
                       </button>
@@ -710,10 +710,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
             const latestInterview = [...group.interviews].sort(sortInterviewsByDateAndUpdated)[0]
 
             return (
-              <div key={key} className="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200 hover:border-indigo-300 transition-all">
+              <div key={key} className="bg-elevated rounded-lg shadow-lg overflow-hidden border-2 border-border hover:border-accent/40 transition-all">
                 {/* Parent Card - Company Header */}
                 <div
-                  className="p-6 cursor-pointer hover:bg-indigo-50 transition-all bg-gradient-to-r from-white to-gray-50"
+                  className="p-6 cursor-pointer hover:bg-accent-subtle transition-all bg-gradient-to-r from-elevated to-elevated-muted"
                   onClick={() => toggleCard(key)}
                 >
                   <div className="flex justify-between items-start gap-4">
@@ -722,7 +722,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                       <div className="flex items-center gap-2 mb-3">
                         {/* Expand/Collapse Icon */}
                         <svg
-                          className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                          className={`w-5 h-5 text-muted transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -731,19 +731,19 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         </svg>
                         
                         {/* Company Title */}
-                        <h3 className="text-xl font-bold text-gray-900">
+                        <h3 className="text-xl font-bold text-foreground">
                           {group.profile} · {group.company}
                         </h3>
                       </div>
                       
                       {/* Interview Steps Progress */}
-                      <div className="flex items-center flex-wrap gap-2 text-sm text-gray-600 ml-7">
+                      <div className="flex items-center flex-wrap gap-2 text-sm text-muted ml-7">
                         {sortedInterviews.map((interview, idx) => (
                           <span key={interview.id} className="flex items-center">
-                            <span className="font-semibold text-gray-700">{interview.step}</span>
-                            <span className="text-xs text-gray-500 ml-1">({formatDate(interview.interview_date)})</span>
+                            <span className="font-semibold text-secondary">{interview.step}</span>
+                            <span className="text-xs text-muted ml-1">({formatDate(interview.interview_date)})</span>
                             {idx < sortedInterviews.length - 1 && (
-                              <span className="mx-2 text-indigo-400 font-bold">→</span>
+                              <span className="mx-2 text-accent/60 font-bold">→</span>
                             )}
                           </span>
                         ))}
@@ -756,7 +756,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         e.stopPropagation()
                         openStatusModal(latestInterview)
                       }}
-                      className={`px-4 py-2 inline-flex text-sm font-bold rounded-lg ${getStateColor(group.latestStatus)} hover:ring-2 hover:ring-offset-2 hover:ring-indigo-500 transition-all shadow-sm`}
+                      className={`px-4 py-2 inline-flex text-sm font-bold rounded-lg ${getStateColor(group.latestStatus)} hover:ring-2 hover:ring-offset-2 hover:ring-accent/30 transition-all shadow-sm`}
                     >
                       {group.latestStatus}
                     </button>
@@ -765,33 +765,33 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
                 {/* Expanded Child Cards - Individual Interviews */}
                 {isExpanded && (
-                  <div className="border-t-4 border-indigo-200 bg-gradient-to-b from-gray-50 to-gray-100">
-                    <div className="px-6 py-3 bg-indigo-50 border-b border-indigo-100">
-                      <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">Interview Details</p>
+                  <div className="border-t-4 border-accent/30 bg-gradient-to-b from-elevated-muted to-elevated-muted/80">
+                    <div className="px-6 py-3 bg-accent-subtle border-b border-accent/20">
+                      <p className="text-xs font-semibold text-accent-hover uppercase tracking-wide">Interview Details</p>
                     </div>
                     
                     {sortedInterviews.map((interview, idx) => (
                       <div 
                         key={interview.id} 
-                        className="mx-4 my-3 bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+                        className="mx-4 my-3 bg-elevated rounded-lg shadow-sm border border-border p-4 hover:shadow-md transition-shadow"
                       >
                         {/* Interview Header - Single Line */}
                         <div className="flex justify-between items-center mb-3">
                           <div className="flex items-center gap-2 flex-1">
-                            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-sm flex-shrink-0">
+                            <div className="w-8 h-8 bg-accent-muted rounded-full flex items-center justify-center text-accent-hover font-bold text-sm flex-shrink-0">
                               {idx + 1}
                             </div>
-                            <h4 className="font-bold text-gray-900 text-base">{interview.step}</h4>
+                            <h4 className="font-bold text-foreground text-base">{interview.step}</h4>
                           </div>
                           
                           {/* Date and Action Buttons */}
                           <div className="flex items-center gap-3">
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-muted">
                               📅 {formatDate(interview.interview_date)}
                             </span>
                             <button
                               onClick={() => openEditModal(interview)}
-                              className="px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
+                              className="px-3 py-1 text-xs font-medium text-accent bg-accent-subtle hover:bg-accent-muted rounded-md transition-colors"
                             >
                               ✏️ Edit
                             </button>
@@ -808,8 +808,8 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         {/* Interview Note */}
                         {interview.note && (
                           <div className="mt-2">
-                            <p className="text-xs font-semibold text-gray-500 mb-1">Note:</p>
-                            <p className="text-sm text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 whitespace-pre-wrap">
+                            <p className="text-xs font-semibold text-muted mb-1">Note:</p>
+                            <p className="text-sm text-secondary bg-elevated-muted p-3 rounded-lg border border-border whitespace-pre-wrap">
                               {interview.note}
                             </p>
                           </div>
@@ -818,12 +818,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         {/* Interview Image */}
                         {interview.image_url && (
                           <div className="mt-2">
-                            <p className="text-xs font-semibold text-gray-500 mb-1">Attached Image:</p>
+                            <p className="text-xs font-semibold text-muted mb-1">Attached Image:</p>
                             <div className="flex justify-center">
                               <img 
                                 src={interview.image_url} 
                                 alt="Interview attachment"
-                                className="max-w-xs h-32 object-contain bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                                className="max-w-xs h-32 object-contain bg-elevated-muted rounded-lg border border-border cursor-pointer hover:opacity-80 transition-opacity"
                                 onClick={() => setZoomImageUrl(interview.image_url)}
                               />
                             </div>
@@ -834,7 +834,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                         {interview.script && (
                           <div className="mt-2">
                             <div className="flex items-center gap-2">
-                              <p className="text-xs font-semibold text-gray-500">Interview Script:</p>
+                              <p className="text-xs font-semibold text-muted">Interview Script:</p>
                               <button
                                 onClick={() => openScriptModal(interview.script!)}
                                 className="text-xs px-3 py-1 bg-green-600 text-white hover:bg-green-700 rounded transition-colors font-medium"
@@ -858,10 +858,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
+        <div className="fixed inset-0 bg-elevated-muted0 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-elevated rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-medium text-foreground">
                 {editingInterview ? 'Edit Interview' : 'Add Interview'}
               </h3>
             </div>
@@ -875,7 +875,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="profile" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="profile" className="block text-sm font-medium text-secondary">
                     Profile *
                   </label>
                   <input
@@ -885,12 +885,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     required
                     placeholder="e.g., david, matthew"
                     defaultValue={editingInterview?.profile}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-accent/20 sm:text-sm text-foreground bg-elevated"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="company" className="block text-sm font-medium text-secondary">
                     Company *
                   </label>
                   <input
@@ -900,12 +900,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     required
                     placeholder="e.g., Google, Apple, Facebook"
                     defaultValue={editingInterview?.company}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-accent/20 sm:text-sm text-foreground bg-elevated"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="step" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="step" className="block text-sm font-medium text-secondary">
                     Interview Step *
                   </label>
                   <input
@@ -915,12 +915,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     required
                     placeholder="e.g., Phone Screen, Technical, Final"
                     defaultValue={editingInterview?.step}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-accent/20 sm:text-sm text-foreground bg-elevated"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="interview_date" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="interview_date" className="block text-sm font-medium text-secondary">
                     Interview Date *
                   </label>
                   <input
@@ -929,12 +929,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     id="interview_date"
                     required
                     defaultValue={editingInterview?.interview_date || new Date().toISOString().split('T')[0]}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-accent/20 sm:text-sm text-foreground bg-elevated"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label htmlFor="note" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="note" className="block text-sm font-medium text-secondary">
                     Note (Optional)
                   </label>
                   <textarea
@@ -942,12 +942,12 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     id="note"
                     rows={3}
                     defaultValue={editingInterview?.note || ''}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm text-gray-900 bg-white"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-accent/20 sm:text-sm text-foreground bg-elevated"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label htmlFor="script" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="script" className="block text-sm font-medium text-secondary">
                     Interview Script (Optional)
                   </label>
                   <textarea
@@ -955,20 +955,20 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                     id="script"
                     rows={6}
                     defaultValue={editingInterview?.script || ''}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm font-mono text-xs text-gray-900 bg-white"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-accent focus:outline-none focus:ring-accent/20 sm:text-sm font-mono text-xs text-foreground bg-elevated"
                   />
                 </div>
 
                 {/* Image Upload Section */}
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-secondary mb-2">
                     Attach Image (Optional)
                   </label>
                   
                   {/* Image Preview or Upload Button */}
                   {imagePreview ? (
                     <div className="space-y-2">
-                      <div className="relative border-2 border-gray-300 rounded-lg p-2 bg-gray-50">
+                      <div className="relative border-2 border-border rounded-lg p-2 bg-elevated-muted">
                         <img 
                           src={imagePreview} 
                           alt="Preview" 
@@ -994,11 +994,11 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                       />
                       <label
                         htmlFor="image-upload"
-                        className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        className="cursor-pointer inline-flex items-center px-4 py-2 border border-border shadow-sm text-sm font-medium rounded-md text-secondary bg-elevated-muted hover:bg-border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent/20"
                       >
                         📎 Attach Image
                       </label>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-muted">
                         Supported formats: JPG, PNG, GIF (Max size: 5MB)
                       </p>
                     </div>
@@ -1011,14 +1011,14 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   type="button"
                   onClick={closeModal}
                   disabled={loading}
-                  className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                  className="inline-flex justify-center rounded-md border border-border bg-elevated px-4 py-2 text-sm font-medium text-secondary shadow-sm hover:bg-elevated-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:ring-offset-2 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                  className="inline-flex justify-center rounded-md border border-transparent bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent/20 focus:ring-offset-2 disabled:opacity-50"
                 >
                   {loading ? 'Saving...' : editingInterview ? 'Update' : 'Create'}
                 </button>
@@ -1030,16 +1030,16 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
       {/* Status Change Modal */}
       {statusModalOpen && statusChangeInterview && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">
+        <div className="fixed inset-0 bg-elevated-muted0 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-elevated rounded-lg shadow-xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-medium text-foreground">
                 Change Status
               </h3>
             </div>
 
             <div className="px-6 py-4">
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-muted mb-4">
                 Update status for: <strong>{statusChangeInterview.step}</strong> at <strong>{statusChangeInterview.company}</strong>
               </p>
 
@@ -1050,10 +1050,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
                     statusChangeInterview.state === 'Ongoing'
                       ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-blue-300'
+                      : 'border-border hover:border-blue-300'
                   } disabled:opacity-50`}
                 >
-                  <span className="font-medium text-gray-900">Ongoing</span>
+                  <span className="font-medium text-foreground">Ongoing</span>
                 </button>
 
                 <button
@@ -1062,10 +1062,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
                     statusChangeInterview.state === 'Offer'
                       ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200 hover:border-green-300'
+                      : 'border-border hover:border-green-300'
                   } disabled:opacity-50`}
                 >
-                  <span className="font-medium text-gray-900">Offer</span>
+                  <span className="font-medium text-foreground">Offer</span>
                 </button>
 
                 <button
@@ -1074,10 +1074,10 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
                     statusChangeInterview.state === 'Rejected'
                       ? 'border-red-500 bg-red-50'
-                      : 'border-gray-200 hover:border-red-300'
+                      : 'border-border hover:border-red-300'
                   } disabled:opacity-50`}
                 >
-                  <span className="font-medium text-gray-900">Rejected</span>
+                  <span className="font-medium text-foreground">Rejected</span>
                 </button>
 
                 <button
@@ -1085,20 +1085,20 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   disabled={loading}
                   className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${
                     !statusChangeInterview.state || statusChangeInterview.state === 'None'
-                      ? 'border-gray-500 bg-gray-50'
-                      : 'border-gray-200 hover:border-gray-400'
+                      ? 'border-border bg-elevated-muted'
+                      : 'border-border hover:border-gray-400'
                   } disabled:opacity-50`}
                 >
-                  <span className="font-medium text-gray-900">No Status</span>
+                  <span className="font-medium text-foreground">No Status</span>
                 </button>
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <div className="px-6 py-4 border-t border-border flex justify-end">
               <button
                 onClick={closeStatusModal}
                 disabled={loading}
-                className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                className="inline-flex justify-center rounded-md border border-border bg-elevated px-4 py-2 text-sm font-medium text-secondary shadow-sm hover:bg-elevated-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:ring-offset-2 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1109,11 +1109,11 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
       {/* Loading Spinner Overlay */}
       {loading && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+        <div className="fixed inset-0 bg-elevated-muted0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-elevated rounded-lg p-6 shadow-xl">
             <div className="flex flex-col items-center">
               <Spinner size="lg" />
-              <p className="mt-4 text-sm text-gray-700 font-medium">Processing...</p>
+              <p className="mt-4 text-sm text-secondary font-medium">Processing...</p>
             </div>
           </div>
         </div>
@@ -1148,18 +1148,18 @@ export default function InterviewsTable({ initialInterviews }: Props) {
       {scriptModalOpen && currentScript && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div 
-            className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-[85vh] flex flex-col"
+            className="bg-elevated rounded-lg shadow-xl w-full max-w-7xl h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Interview Script Analysis</h3>
+            <div className="flex justify-between items-center px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">Interview Script Analysis</h3>
               <button
                 onClick={closeScriptModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-muted/70 hover:text-muted transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1171,11 +1171,11 @@ export default function InterviewsTable({ initialInterviews }: Props) {
             <div className="flex-1 flex overflow-hidden relative">
               {/* Left - Script Display */}
               <div className="flex flex-col overflow-hidden" style={{ width: `${leftWidth}%` }}>
-                <div className="flex justify-between items-center px-6 py-3 border-b border-gray-200 bg-gray-50">
-                  <h4 className="text-sm font-semibold text-gray-700">Interview Script</h4>
+                <div className="flex justify-between items-center px-6 py-3 border-b border-border bg-elevated-muted">
+                  <h4 className="text-sm font-semibold text-secondary">Interview Script</h4>
                   <button
                     onClick={() => handleCopyScript(currentScript, 'modal')}
-                    className="text-xs px-3 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded transition-colors flex items-center gap-1"
+                    className="text-xs px-3 py-1 bg-accent-subtle text-accent hover:bg-accent-muted rounded transition-colors flex items-center gap-1"
                   >
                     {copiedScriptId === 'modal' ? (
                       <>
@@ -1195,7 +1195,7 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-6">
-                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
+                  <pre className="text-sm text-secondary whitespace-pre-wrap font-sans leading-relaxed">
                     {currentScript}
                   </pre>
                 </div>
@@ -1203,40 +1203,40 @@ export default function InterviewsTable({ initialInterviews }: Props) {
 
               {/* Resize Handle */}
               <div
-                className="w-1 bg-gray-300 hover:bg-indigo-500 cursor-col-resize transition-colors flex-shrink-0 relative group"
+                className="w-1 bg-gray-300 hover:bg-accent-subtle0 cursor-col-resize transition-colors flex-shrink-0 relative group"
                 onMouseDown={handleMouseDown}
               >
                 <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center">
-                  <div className="w-1 h-12 bg-gray-400 group-hover:bg-indigo-600 rounded-full transition-colors"></div>
+                  <div className="w-1 h-12 bg-gray-400 group-hover:bg-accent rounded-full transition-colors"></div>
                 </div>
               </div>
 
               {/* Right - AI Analysis */}
               <div className="flex flex-col overflow-hidden" style={{ width: `${100 - leftWidth}%` }}>
-                <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-                  <h4 className="text-sm font-semibold text-gray-700">AI Analysis</h4>
+                <div className="px-4 py-3 border-b border-border bg-elevated-muted">
+                  <h4 className="text-sm font-semibold text-secondary">AI Analysis</h4>
                 </div>
                 
                 {/* AI Responses */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-elevated-muted">
                   {aiResponses.length === 0 ? (
-                    <div className="text-center text-gray-500 text-sm mt-8">
-                      <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center text-muted text-sm mt-8">
+                      <svg className="w-12 h-12 mx-auto mb-3 text-muted/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
                       <p className="mb-2">Ask AI to analyze this script</p>
-                      <p className="text-xs text-gray-400">e.g., "Summarize the main points"</p>
+                      <p className="text-xs text-muted/70">e.g., "Summarize the main points"</p>
                     </div>
                   ) : (
                     aiResponses.map((item, idx) => (
                       <div key={idx} className="space-y-2">
-                        <div className="bg-indigo-100 rounded-lg p-3">
-                          <p className="text-xs font-semibold text-indigo-900 mb-1">You asked:</p>
-                          <p className="text-sm text-indigo-800">{item.prompt}</p>
+                        <div className="bg-accent-muted rounded-lg p-3">
+                          <p className="text-xs font-semibold text-accent-hover mb-1">You asked:</p>
+                          <p className="text-sm text-accent-hover">{item.prompt}</p>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
-                          <p className="text-xs font-semibold text-gray-600 mb-1">AI Response:</p>
-                          <div className="text-sm text-gray-800 prose prose-sm max-w-none">
+                        <div className="bg-elevated rounded-lg p-3 border border-border">
+                          <p className="text-xs font-semibold text-muted mb-1">AI Response:</p>
+                          <div className="text-sm text-secondary prose prose-sm max-w-none">
                             <ReactMarkdown>{item.response}</ReactMarkdown>
                           </div>
                         </div>
@@ -1251,18 +1251,18 @@ export default function InterviewsTable({ initialInterviews }: Props) {
                 </div>
 
                 {/* Prompt Input */}
-                <div className="border-t border-gray-200 p-4 bg-white">
+                <div className="border-t border-border p-4 bg-elevated">
                   <textarea
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
                     placeholder="Ask AI about this interview script..."
                     rows={3}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 mb-2 text-gray-900 bg-white"
+                    className="w-full rounded-md border border-border px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-accent/20 mb-2 text-foreground bg-elevated"
                   />
                   <button
                     onClick={handleAiAnalysis}
                     disabled={aiLoading || !aiPrompt.trim()}
-                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="w-full px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
                   >
                     {aiLoading ? (
                       <>

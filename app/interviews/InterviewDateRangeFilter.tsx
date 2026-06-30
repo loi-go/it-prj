@@ -25,7 +25,7 @@ export default function InterviewDateRangeFilter({
 }: Props) {
   return (
     <div className={loading ? 'opacity-60 pointer-events-none' : undefined}>
-      <label htmlFor="interviewDatePreset" className="block text-sm font-semibold text-gray-700 mb-2">
+      <label htmlFor="interviewDatePreset" className="label mb-2">
         Date Range
       </label>
 
@@ -38,7 +38,7 @@ export default function InterviewDateRangeFilter({
             onPresetSelect(e.target.value as InterviewDatePreset)
           }
         }}
-        className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white disabled:opacity-50 mb-3"
+        className="input-field !py-2 mb-3 disabled:opacity-50"
       >
         <option value="custom">Custom range</option>
         {INTERVIEW_DATE_PRESETS.map(preset => (
@@ -50,9 +50,7 @@ export default function InterviewDateRangeFilter({
 
       <div className="grid grid-cols-1 gap-2">
         <div>
-          <label htmlFor="filterDateFrom" className="block text-xs font-medium text-gray-500 mb-1">
-            From
-          </label>
+          <label htmlFor="filterDateFrom" className="label-sm">From</label>
           <input
             id="filterDateFrom"
             type="date"
@@ -60,13 +58,11 @@ export default function InterviewDateRangeFilter({
             max={dateTo}
             disabled={loading}
             onChange={(e) => onDateFromChange(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white disabled:opacity-50"
+            className="input-field !py-2 disabled:opacity-50"
           />
         </div>
         <div>
-          <label htmlFor="filterDateTo" className="block text-xs font-medium text-gray-500 mb-1">
-            To
-          </label>
+          <label htmlFor="filterDateTo" className="label-sm">To</label>
           <input
             id="filterDateTo"
             type="date"
@@ -74,12 +70,12 @@ export default function InterviewDateRangeFilter({
             min={dateFrom || undefined}
             disabled={loading}
             onChange={(e) => onDateToChange(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-2 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white disabled:opacity-50"
+            className="input-field !py-2 disabled:opacity-50"
           />
         </div>
       </div>
 
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-2 text-xs text-muted">
         {formatInterviewDateRangeSummary(dateFrom, dateTo)}
       </p>
     </div>

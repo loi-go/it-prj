@@ -12,12 +12,12 @@ export default function InterviewFilterSummary({
   loading = false,
 }: Props) {
   return (
-    <div className="rounded-lg border border-indigo-100 bg-indigo-50 px-3 py-2">
-      <p className="text-sm font-semibold text-indigo-900">
+    <div className="rounded-xl border border-accent/20 bg-accent-subtle px-3 py-2">
+      <p className="text-sm font-semibold text-accent-hover">
         {loading ? 'Loading interviews...' : `${interviewCount} interview${interviewCount === 1 ? '' : 's'}`}
       </p>
       {!loading && (
-        <p className="mt-1 text-xs text-indigo-700">
+        <p className="mt-1 text-xs text-accent">
           {companyCount} compan{companyCount === 1 ? 'y' : 'ies'} · {interviewCount} of {totalInterviewCount} loaded
         </p>
       )}

@@ -31,16 +31,14 @@ export default async function AdminPage() {
   const rows = 'data' in list ? list.data : []
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-shell">
       <AppNav section="admin" />
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900">User management</h2>
+          <h2 className="mb-4 heading-page">User management</h2>
           {'error' in list && list.error && (
-            <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-              {list.error}
-            </div>
+            <div className="mb-4 alert-warning">{list.error}</div>
           )}
           <UserManagement initialUsers={rows} currentUserId={user.id} />
         </div>
