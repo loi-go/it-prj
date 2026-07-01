@@ -1,57 +1,78 @@
 'use server'
 
-import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+const CLAUDE_SONNET_MODEL =
+  process.env.CLAUDE_MODEL?.trim() || 'claude-sonnet-4-6'
 
-export async function analyzeInterviewScript(script: string, prompt: string): Promise<{ success: true; response: string } | { success: false; error: string }> {
+const INTERVIEW_ANALYSIS_INSTRUCTIONS = `You are an expert interview analyst. Read the interview script and extract structured details.
+
+Respond in Markdown using exactly these sections and headings:
+
+## Job Title
+-
+
+## Interviewers
+(with role)
+
+## Brief JD
+
+## Salary expectation
+
+## Hiring Process
+
+## When can candidate hear about the result of this interview
+
+## Main points of this interview
+
+## Red Flags
+
+## Pass Rate
+(can pass to next interview)
+
+Use "-" or "Not mentioned" when information is missing from the script. Be factual and only include details supported by the script.`
+
+function getAnthropicClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not configured')
+  }
+  return new Anthropic({ apiKey })
+}
+
+export async function generateInterviewAiAnalysis(
+  script: string
+): Promise<{ success: true; response: string } | { success: false; error: string }> {
+  const trimmedScript = script.trim()
+  if (!trimmedScript) {
+    return { success: false, error: 'Script is empty' }
+  }
+
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
+    const anthropic = getAnthropicClient()
+    const message = await anthropic.messages.create({
+      model: CLAUDE_SONNET_MODEL,
+      max_tokens: 2000,
       messages: [
         {
-          role: 'system',
-          content: `You are an expert interview coach and analyst. Your role is to help users understand and improve their interview performance by analyzing interview scripts.
-
-ALWAYS format your responses in well-structured Markdown with:
-- Use **bold** for key points and important information
-- Use bullet points (- or *) for lists
-- Use numbered lists (1., 2., 3.) for sequential steps or rankings
-- Use ## for main sections and ### for subsections
-- Use \`code blocks\` for specific quotes or technical terms
-- Use > blockquotes for emphasized takeaways
-- Use horizontal rules (---) to separate major sections when appropriate
-
-When analyzing interviews, consider:
-- Strengths and areas for improvement
-- Communication clarity and effectiveness
-- Technical accuracy (if applicable)
-- Follow-up questions that could have been asked
-- Overall impression and recommendations
-
-Be concise, actionable, and constructive in your feedback.`
-        },
-        {
           role: 'user',
-          content: `Interview Script:\n\n${script}\n\nUser Question/Request:\n${prompt}`
-        }
+          content: `${INTERVIEW_ANALYSIS_INSTRUCTIONS}\n\nInterview Script:\n\n${trimmedScript}`,
+        },
       ],
-      temperature: 0.7,
-      max_tokens: 1500,
     })
 
-    const content = response.choices[0].message.content
+    const textBlock = message.content.find((block) => block.type === 'text')
+    const content = textBlock && textBlock.type === 'text' ? textBlock.text : ''
+
     return {
       success: true,
-      response: content || 'No response generated'
+      response: content || 'No analysis generated',
     }
   } catch (error) {
-    console.error('OpenAI API Error:', error)
+    console.error('Claude API Error:', error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to analyze script'
+      error: error instanceof Error ? error.message : 'Failed to analyze script',
     }
   }
 }

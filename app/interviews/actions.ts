@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import sharp from 'sharp'
+import { generateInterviewAiAnalysis } from './ai-actions'
 import { getInterviewCutoffDate, INTERVIEWS_DEFAULT_MONTHS, type InterviewDateRange } from './utils'
 
 function resolveInterviewDateRange(range?: InterviewDateRange) {
@@ -30,6 +31,19 @@ function applyInterviewDateFilters<T extends { gte: Function; lte: Function }>(
   }
 
   return query
+}
+
+async function analyzeScriptForStorage(script: string | null) {
+  if (!script?.trim()) {
+    return { ai_analysis: null as string | null, analysisWarning: undefined as string | undefined }
+  }
+
+  const analysis = await generateInterviewAiAnalysis(script)
+  if (analysis.success) {
+    return { ai_analysis: analysis.response, analysisWarning: undefined }
+  }
+
+  return { ai_analysis: null, analysisWarning: analysis.error }
 }
 
 export async function getInterviews(range?: InterviewDateRange) {
@@ -159,6 +173,9 @@ export async function createInterview(formData: FormData) {
     }
   }
 
+  const scriptText = ((formData.get('script') as string) || '').trim() || null
+  const { ai_analysis, analysisWarning } = await analyzeScriptForStorage(scriptText)
+
   const interview = {
     user_id: user.id,
     profile: formData.get('profile') as string,
@@ -166,7 +183,8 @@ export async function createInterview(formData: FormData) {
     step: formData.get('step') as string,
     interview_date: formData.get('interview_date') as string,
     note: formData.get('note') as string || null,
-    script: formData.get('script') as string || null,
+    script: scriptText,
+    ai_analysis,
     state: formData.get('state') as string || 'Ongoing',
     interview_type: formData.get('interview_type') as string || null,
     image_url: imageUrl,
@@ -188,7 +206,8 @@ export async function createInterview(formData: FormData) {
   }
 
   revalidatePath('/dashboard')
-  return { success: true, data }
+  revalidatePath('/interviews')
+  return { success: true, data, analysisWarning }
 }
 
 export async function updateInterview(id: string, formData: FormData) {
@@ -200,10 +219,10 @@ export async function updateInterview(id: string, formData: FormData) {
     return { error: 'Unauthorized' }
   }
 
-  // Get current interview to check for existing image
+  // Get current interview to check for existing image and script
   const { data: currentInterview } = await supabase
     .from('interviews')
-    .select('image_url')
+    .select('image_url, script')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -265,16 +284,30 @@ export async function updateInterview(id: string, formData: FormData) {
     }
   }
 
+  const scriptText = ((formData.get('script') as string) || '').trim() || null
+  const previousScript = (currentInterview?.script as string | null)?.trim() || null
+  const scriptChanged = scriptText !== previousScript
+
+  let ai_analysis: string | null | undefined = undefined
+  let analysisWarning: string | undefined
+
+  if (scriptChanged) {
+    const analysisResult = await analyzeScriptForStorage(scriptText)
+    ai_analysis = analysisResult.ai_analysis
+    analysisWarning = analysisResult.analysisWarning
+  }
+
   const updates = {
     profile: formData.get('profile') as string,
     company: formData.get('company') as string,
     step: formData.get('step') as string,
     interview_date: formData.get('interview_date') as string,
     note: formData.get('note') as string || null,
-    script: formData.get('script') as string || null,
+    script: scriptText,
     state: formData.get('state') as string,
     interview_type: formData.get('interview_type') as string || null,
     image_url: imageUrl,
+    ...(ai_analysis !== undefined ? { ai_analysis } : {}),
   }
 
   const { data, error } = await supabase
@@ -290,6 +323,53 @@ export async function updateInterview(id: string, formData: FormData) {
   }
 
   revalidatePath('/dashboard')
+  revalidatePath('/interviews')
+  return { success: true, data, analysisWarning }
+}
+
+export async function regenerateInterviewAnalysis(id: string) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Unauthorized' }
+  }
+
+  const { data: interview, error: fetchError } = await supabase
+    .from('interviews')
+    .select('script')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError || !interview) {
+    return { error: fetchError?.message || 'Interview not found' }
+  }
+
+  const scriptText = (interview.script as string | null)?.trim()
+  if (!scriptText) {
+    return { error: 'This interview has no script to analyze' }
+  }
+
+  const analysis = await generateInterviewAiAnalysis(scriptText)
+  if (!analysis.success) {
+    return { error: analysis.error }
+  }
+
+  const { data, error: updateError } = await supabase
+    .from('interviews')
+    .update({ ai_analysis: analysis.response })
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .select()
+    .single()
+
+  if (updateError) {
+    return { error: updateError.message }
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/interviews')
   return { success: true, data }
 }
 
